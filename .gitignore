@@ -18,10 +18,13 @@ build/
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 
-# Data (not versioned)
+# Data (raw and models not versioned)
 data/raw/
-data/processed/
 data/models/
+
+# Processed data — base_municipal_mvp.csv is versioned for deploy
+data/processed/fundeb_municipios_*.csv
+data/processed/ideb_municipios_*.csv
 
 # OS
 .DS_Store
