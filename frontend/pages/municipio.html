@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FUNDEB Insights — Exploração Municipal</title>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <link rel="stylesheet" href="../assets/css/municipio.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="nav">
+      <span class="nav-logo">FUNDEB Insights</span>
+      <ul class="nav-links">
+        <li><a href="../index.html">Visão Executiva</a></li>
+        <li><a href="distribuicao.html">Distribuição</a></li>
+        <li><a href="desempenho.html">Desempenho</a></li>
+        <li><a href="eficiencia.html">Eficiência</a></li>
+        <li><a href="municipio.html" class="active">Município</a></li>
+        <li><a href="sobre.html">Sobre</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- Search -->
+    <section class="section search-section">
+      <div class="search-hero">
+        <div class="hero-badge">Exploração Municipal</div>
+        <h1>Consulte qualquer município</h1>
+        <p>Busque pelo nome e veja a ficha completa — financeiro FUNDEB e desempenho IDEB.</p>
+      </div>
+
+      <div class="search-bar-wrap">
+        <div class="search-row">
+          <div class="search-input-wrap">
+            <svg class="search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="8.5" cy="8.5" r="5.5"/><line x1="13" y1="13" x2="18" y2="18"/>
+            </svg>
+            <input
+              id="search-input"
+              type="text"
+              class="search-input"
+              placeholder="Digite o nome do município..."
+              autocomplete="off"
+            />
+            <div id="autocomplete-list" class="autocomplete-list hidden"></div>
+          </div>
+          <select id="filter-uf" class="select-control select-uf">
+            <option value="">Todos os estados</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Empty state -->
+    <section class="section" id="empty-state">
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <p>Nenhum município selecionado.<br>Use a busca acima para começar.</p>
+      </div>
+    </section>
+
+    <!-- Municipality card -->
+    <section class="section hidden" id="municipio-card">
+
+      <div class="muni-header">
+        <div class="muni-header-left">
+          <div class="muni-uf-badge" id="muni-uf"></div>
+          <div>
+            <h2 class="muni-name" id="muni-name"></h2>
+            <p class="muni-cod" id="muni-cod"></p>
+          </div>
+        </div>
+        <div class="muni-header-right">
+          <div class="muni-pop-block">
+            <span class="muni-pop-label">População estimada</span>
+            <span class="muni-pop-value" id="muni-pop"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="muni-body">
+
+        <!-- Financial block -->
+        <div class="muni-block">
+          <h3 class="muni-block-title">
+            <span class="block-dot block-dot--green"></span>
+            Financeiro FUNDEB 2026
+          </h3>
+
+          <div class="metric-row metric-row--highlight">
+            <span class="metric-label">Receita total prevista</span>
+            <span class="metric-value" id="fin-total"></span>
+          </div>
+          <div class="metric-row metric-row--highlight">
+            <span class="metric-label">Receita per capita</span>
+            <span class="metric-value metric-value--primary" id="fin-per-capita"></span>
+          </div>
+
+          <div class="metric-divider"></div>
+
+          <div class="metric-row">
+            <span class="metric-label">Contribuição estados/municípios</span>
+            <span class="metric-value" id="fin-contribuicao"></span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Complementação VAAF</span>
+            <span class="metric-value" id="fin-vaaf"></span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Complementação VAAT</span>
+            <span class="metric-value" id="fin-vaat"></span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Complementação VAAR</span>
+            <span class="metric-value" id="fin-vaar"></span>
+          </div>
+          <div class="metric-row metric-row--total">
+            <span class="metric-label">Complementação da União (total)</span>
+            <span class="metric-value" id="fin-uniao"></span>
+          </div>
+
+          <div class="metric-divider"></div>
+          <p class="comparison-label">Per capita vs médias</p>
+          <div id="pc-comparisons"></div>
+        </div>
+
+        <!-- Educational block -->
+        <div class="muni-block">
+          <h3 class="muni-block-title">
+            <span class="block-dot block-dot--blue"></span>
+            Desempenho Educacional — IDEB 2023
+          </h3>
+
+          <div class="ideb-scores">
+            <div class="ideb-card" id="ideb-iniciais-card">
+              <div class="ideb-etapa">Anos Iniciais</div>
+              <div class="ideb-score" id="ideb-iniciais">—</div>
+              <div class="ideb-sub">Ens. Fundamental I · Rede pública</div>
+            </div>
+            <div class="ideb-card" id="ideb-finais-card">
+              <div class="ideb-etapa">Anos Finais</div>
+              <div class="ideb-score" id="ideb-finais">—</div>
+              <div class="ideb-sub">Ens. Fundamental II · Rede pública</div>
+            </div>
+          </div>
+
+          <div class="metric-divider"></div>
+          <p class="comparison-label">IDEB Anos Iniciais vs médias</p>
+          <div id="ideb-comparisons"></div>
+
+          <div class="metric-divider"></div>
+          <p class="comparison-label">IDEB Anos Finais vs médias</p>
+          <div id="ideb-finais-comparisons"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Dados: FNDE (FUNDEB 2026) · INEP (IDEB 2023) · IBGE (Estimativas 2021)</p>
+    <p>Desenvolvido por <a href="https://linkedin.com/in/brunocordeirosantos" target="_blank">Bruno Cordeiro Santos</a> · Revenue Ops &amp; BI</p>
+  </footer>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/municipio.js"></script>
+</body>
+</html>

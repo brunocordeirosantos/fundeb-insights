@@ -1,0 +1,234 @@
+/* ============================================================
+   municipio.css — Exploração Municipal
+   ============================================================ */
+
+/* ── Search section ──────────────────────────────────────── */
+.search-section { padding-top: var(--space-xl); }
+
+.search-hero { margin-bottom: var(--space-lg); }
+.search-hero h1 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 700; margin-bottom: var(--space-sm); }
+.search-hero p  { color: var(--color-muted); font-size: 1rem; }
+
+.search-bar-wrap { max-width: 680px; }
+
+.search-row {
+  display: flex; gap: var(--space-sm);
+  align-items: stretch;
+}
+
+.search-input-wrap {
+  position: relative; flex: 1;
+}
+
+.search-input {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-size: 1rem;
+  padding: 12px 16px 12px 44px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.search-input:focus { border-color: var(--color-primary); }
+.search-input::placeholder { color: var(--color-muted); }
+
+.search-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; color: var(--color-muted); pointer-events: none;
+}
+
+.select-uf {
+  min-width: 130px;
+  border-radius: var(--radius-md);
+  padding: 12px 10px;
+}
+
+/* ── Autocomplete ─────────────────────────────────────────── */
+.autocomplete-list {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 200;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.autocomplete-list.hidden { display: none; }
+
+.autocomplete-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.1s;
+  border-bottom: 1px solid var(--color-border);
+}
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover { background: var(--color-surface); }
+
+.ac-name { font-size: 0.9rem; font-weight: 500; }
+.ac-uf   { font-size: 0.78rem; color: var(--color-muted); margin-left: var(--space-sm); }
+.ac-pc   { font-size: 0.78rem; color: var(--color-accent); white-space: nowrap; }
+
+/* ── Empty state ──────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: var(--space-xl) 0;
+  color: var(--color-muted);
+}
+.empty-icon { font-size: 2.5rem; margin-bottom: var(--space-md); }
+.empty-state p { line-height: 1.8; }
+
+/* ── Municipality card ────────────────────────────────────── */
+.muni-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  flex-wrap: wrap; gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  margin-bottom: 0;
+}
+
+.muni-header-left  { display: flex; align-items: center; gap: var(--space-md); }
+.muni-header-right { text-align: right; }
+
+.muni-uf-badge {
+  font-size: 1.1rem; font-weight: 800; letter-spacing: 0.04em;
+  color: var(--color-bg);
+  background: var(--color-accent);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  min-width: 52px; text-align: center;
+}
+.muni-name { font-size: 1.6rem; font-weight: 700; }
+.muni-cod  { font-size: 0.8rem; color: var(--color-muted); margin-top: 2px; }
+
+.muni-pop-label { display: block; font-size: 0.75rem; color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.muni-pop-value { font-size: 1.4rem; font-weight: 700; color: var(--color-text); }
+
+/* ── Body grid ────────────────────────────────────────────── */
+.muni-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--color-border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  overflow: hidden;
+}
+@media (max-width: 900px) { .muni-body { grid-template-columns: 1fr; } }
+
+.muni-block {
+  padding: var(--space-lg);
+  background: var(--color-bg);
+}
+.muni-block + .muni-block {
+  border-left: 1px solid var(--color-border);
+}
+@media (max-width: 900px) {
+  .muni-block + .muni-block { border-left: none; border-top: 1px solid var(--color-border); }
+}
+
+.muni-block-title {
+  display: flex; align-items: center; gap: var(--space-sm);
+  font-size: 0.85rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--color-muted);
+  margin-bottom: var(--space-lg);
+}
+.block-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.block-dot--green { background: var(--color-accent); }
+.block-dot--blue  { background: var(--color-primary); }
+
+/* ── Metric rows ──────────────────────────────────────────── */
+.metric-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.metric-row:last-of-type { border-bottom: none; }
+
+.metric-row--highlight { padding: 12px 0; }
+.metric-row--highlight .metric-label { font-weight: 500; color: var(--color-text); }
+.metric-row--highlight .metric-value { font-size: 1.2rem; font-weight: 700; }
+
+.metric-row--total .metric-label { color: var(--color-muted); font-style: italic; }
+
+.metric-label { font-size: 0.85rem; color: var(--color-muted); }
+.metric-value { font-size: 0.95rem; font-weight: 600; color: var(--color-text); }
+.metric-value--primary { color: var(--color-primary); }
+
+.metric-divider {
+  height: 1px; background: var(--color-border);
+  margin: var(--space-md) 0;
+}
+
+/* ── Comparison bars ──────────────────────────────────────── */
+.comparison-label {
+  font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--color-muted); margin-bottom: var(--space-sm);
+}
+
+.comparison-item {
+  margin-bottom: 14px;
+}
+.comparison-item-header {
+  display: flex; justify-content: space-between;
+  font-size: 0.8rem; color: var(--color-muted);
+  margin-bottom: 5px;
+}
+.comparison-item-header .ci-label { color: var(--color-text); }
+.comparison-item-header .ci-value { font-weight: 600; color: var(--color-primary); }
+
+.bar-track {
+  position: relative;
+  height: 6px; background: var(--color-border); border-radius: 3px;
+  overflow: visible;
+}
+.bar-fill {
+  height: 100%; border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.bar-fill--muni  { background: var(--color-primary); }
+.bar-fill--above { background: var(--color-accent); }
+.bar-fill--below { background: var(--color-danger); }
+
+.bar-marker {
+  position: absolute; top: -3px;
+  width: 2px; height: 12px;
+  background: var(--color-muted);
+  border-radius: 1px;
+}
+.bar-marker-label {
+  position: absolute; top: 14px;
+  font-size: 0.65rem; color: var(--color-muted);
+  white-space: nowrap; transform: translateX(-50%);
+}
+
+/* ── IDEB score cards ─────────────────────────────────────── */
+.ideb-scores {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+.ideb-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  text-align: center;
+  transition: border-color 0.2s;
+}
+.ideb-card.above-avg { border-color: var(--color-accent); }
+.ideb-card.below-avg { border-color: var(--color-danger); }
+.ideb-card.no-data   { opacity: 0.5; }
+
+.ideb-etapa { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-muted); margin-bottom: 6px; }
+.ideb-score { font-size: 2.4rem; font-weight: 800; line-height: 1; color: var(--color-text); }
+.ideb-card.above-avg .ideb-score { color: var(--color-accent); }
+.ideb-card.below-avg .ideb-score { color: var(--color-danger); }
+.ideb-sub   { font-size: 0.72rem; color: var(--color-muted); margin-top: 6px; }
+
+/* ── Utility ──────────────────────────────────────────────── */
+.hidden { display: none !important; }
