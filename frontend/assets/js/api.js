@@ -2,7 +2,7 @@
  * api.js — centralized fetch wrapper for the FastAPI backend.
  */
 
-const API_BASE = "https://fundeb-insights.vercel.app";
+const API_BASE = "https://fundeb-insights.onrender.com";
 
 async function apiFetch(endpoint, params = {}) {
   const url = new URL(API_BASE + endpoint);
