@@ -43,27 +43,29 @@
 
     <!-- Scatter chart + filter -->
     <section class="section">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title">Investimento vs Desempenho</h2>
-          <p class="section-subtitle">Relação entre receita FUNDEB per capita e nota IDEB por município</p>
+      <div class="chart-card">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Investimento vs Desempenho</h2>
+            <p class="section-subtitle">Relação entre receita FUNDEB per capita e nota IDEB por município</p>
+          </div>
+          <div class="chart-controls">
+            <select id="filter-uf" class="select-control">
+              <option value="">Todos os estados</option>
+            </select>
+            <select id="filter-etapa" class="select-control">
+              <option value="ideb_anos_iniciais_2023">Anos Iniciais</option>
+              <option value="ideb_anos_finais_2023">Anos Finais</option>
+            </select>
+            <label class="toggle-label">
+              <input type="checkbox" id="filter-outliers" checked />
+              Ocultar outliers (&gt; R$ 5.000)
+            </label>
+          </div>
         </div>
-        <div class="chart-controls">
-          <select id="filter-uf" class="select-control">
-            <option value="">Todos os estados</option>
-          </select>
-          <select id="filter-etapa" class="select-control">
-            <option value="ideb_anos_iniciais_2023">Anos Iniciais</option>
-            <option value="ideb_anos_finais_2023">Anos Finais</option>
-          </select>
-          <label class="toggle-label">
-            <input type="checkbox" id="filter-outliers" checked />
-            Ocultar outliers (&gt; R$ 5.000)
-          </label>
-        </div>
+        <div id="chart-correlacao" class="chart-container"></div>
+        <p class="chart-note" id="chart-note"></p>
       </div>
-      <div id="chart-correlacao" class="chart-container"></div>
-      <p class="chart-note" id="chart-note"></p>
     </section>
 
     <!-- Top & Bottom ranking -->

@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FUNDEB Insights</title>
+  <title>FUNDEB Insights — Distribuição de Recursos</title>
   <link rel="stylesheet" href="../assets/css/main.css" />
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 </head>
 <body>
+
   <header class="site-header">
     <nav class="nav">
       <span class="nav-logo">FUNDEB Insights</span>
       <ul class="nav-links">
         <li><a href="../index.html">Visão Executiva</a></li>
-        <li><a href="distribuicao.html">Distribuição</a></li>
+        <li><a href="distribuicao.html" class="active">Distribuição</a></li>
         <li><a href="desempenho.html">Desempenho</a></li>
         <li><a href="eficiencia.html">Eficiência</a></li>
         <li><a href="municipio.html">Município</a></li>
@@ -20,12 +22,106 @@
       </ul>
     </nav>
   </header>
+
   <main>
-    <!-- TODO: implement distribuicao page -->
+
+    <section class="hero">
+      <div class="hero-badge">FUNDEB 2026 · 27 estados</div>
+      <h1>Distribuição de Recursos</h1>
+      <p>Compare a receita FUNDEB per capita entre estados e municípios. Entenda onde o investimento é maior — e o que explica essa disparidade.</p>
+    </section>
+
+    <!-- KPIs rápidos -->
+    <section class="section">
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+      </div>
+    </section>
+
+    <!-- Gráfico por estado -->
+    <section class="section">
+      <div class="chart-card">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Per capita médio por estado</h2>
+            <p class="section-subtitle" id="chart-ufs-note">Receita FUNDEB 2026 dividida pela população estimada — média dos municípios de cada UF</p>
+          </div>
+          <div class="chart-controls">
+            <select id="filter-metrica" class="select-control">
+              <option value="media_per_capita">Média per capita</option>
+              <option value="mediana_per_capita">Mediana per capita</option>
+              <option value="soma_receitas">Total FUNDEB (R$)</option>
+            </select>
+            <select id="filter-ordem" class="select-control">
+              <option value="desc">Maior → Menor</option>
+              <option value="asc">Menor → Maior</option>
+            </select>
+          </div>
+        </div>
+        <div id="chart-ufs" class="chart-container" style="height:520px"></div>
+      </div>
+    </section>
+
+    <!-- Ranking por município -->
+    <section class="section">
+      <div class="chart-card">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Ranking municipal</h2>
+            <p class="section-subtitle">Municípios ordenados por receita FUNDEB per capita</p>
+          </div>
+          <div class="chart-controls">
+            <select id="rank-uf" class="select-control">
+              <option value="">Todos os estados</option>
+            </select>
+            <select id="rank-ordem" class="select-control">
+              <option value="desc">Maiores per capita</option>
+              <option value="asc">Menores per capita</option>
+            </select>
+            <select id="rank-limite" class="select-control">
+              <option value="10">Top 10</option>
+              <option value="20" selected>Top 20</option>
+              <option value="50">Top 50</option>
+            </select>
+          </div>
+        </div>
+        <div id="ranking-error" class="api-alert" style="display:none">
+          <span class="api-alert-icon">⚠️</span>
+          <div class="api-alert-body">
+            <span class="api-alert-title">Erro ao carregar ranking</span>
+            <span class="api-alert-desc">Verifique a conexão com a API.</span>
+          </div>
+        </div>
+        <table class="ranking-table" id="ranking-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Município</th>
+              <th>UF</th>
+              <th>População</th>
+              <th>Total FUNDEB</th>
+              <th>Per capita</th>
+              <th>IDEB Iniciais</th>
+            </tr>
+          </thead>
+          <tbody id="ranking-body">
+            <tr><td colspan="7" class="table-loading">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
   </main>
+
+  <footer class="site-footer">
+    <p>Dados: FNDE (FUNDEB 2026) · INEP (IDEB 2023) · IBGE (Estimativas 2021)</p>
+    <p>Desenvolvido por <a href="https://linkedin.com/in/brunocordeirosantos" target="_blank">Bruno Cordeiro Santos</a> · Revenue Ops &amp; BI</p>
+  </footer>
+
   <script src="../assets/js/api.js"></script>
-  <script src="../assets/js/charts.js"></script>
-  <script src="../assets/js/filters.js"></script>
-  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/distribuicao.js"></script>
 </body>
 </html>

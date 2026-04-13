@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FUNDEB Insights</title>
+  <title>FUNDEB Insights — Eficiência Educacional</title>
   <link rel="stylesheet" href="../assets/css/main.css" />
+  <link rel="stylesheet" href="../assets/css/eficiencia.css" />
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 </head>
 <body>
+
   <header class="site-header">
     <nav class="nav">
       <span class="nav-logo">FUNDEB Insights</span>
@@ -14,18 +17,114 @@
         <li><a href="../index.html">Visão Executiva</a></li>
         <li><a href="distribuicao.html">Distribuição</a></li>
         <li><a href="desempenho.html">Desempenho</a></li>
-        <li><a href="eficiencia.html">Eficiência</a></li>
+        <li><a href="eficiencia.html" class="active">Eficiência</a></li>
         <li><a href="municipio.html">Município</a></li>
         <li><a href="sobre.html">Sobre</a></li>
       </ul>
     </nav>
   </header>
+
   <main>
-    <!-- TODO: implement eficiencia page -->
+
+    <section class="hero">
+      <div class="hero-badge">Análise de Resíduos · Regressão Linear</div>
+      <h1>Eficiência Educacional</h1>
+      <p>Quais municípios entregam <strong>mais do que o esperado</strong> dado seu nível de investimento? A análise compara o IDEB real com o IDEB previsto pela regressão — e identifica os outliers positivos.</p>
+    </section>
+
+    <!-- Metodologia -->
+    <section class="section">
+      <div class="method-callout">
+        <div class="method-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+        </div>
+        <div class="method-body">
+          <h3>Como o score de eficiência é calculado</h3>
+          <p>
+            Para cada município com IDEB e per capita disponíveis, ajustamos uma regressão linear simples
+            <em>IDEB = a + b × per_capita</em>. O <strong>resíduo</strong> (IDEB real − IDEB previsto) indica quanto
+            cada município está acima ou abaixo da tendência nacional. Um score positivo significa que o município
+            entrega mais do que a média espera para aquele nível de investimento.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- KPIs -->
+    <section class="section">
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+      </div>
+    </section>
+
+    <!-- Scatter com linha de regressão -->
+    <section class="section">
+      <div class="chart-card">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Curva de eficiência esperada</h2>
+            <p class="section-subtitle" id="scatter-note">Pontos acima da linha entregam mais do que o esperado</p>
+          </div>
+          <div class="chart-controls">
+            <select id="filter-uf" class="select-control">
+              <option value="">Todos os estados</option>
+            </select>
+            <select id="filter-etapa" class="select-control">
+              <option value="iniciais">Anos Iniciais</option>
+              <option value="finais">Anos Finais</option>
+            </select>
+            <label class="toggle-label">
+              <input type="checkbox" id="filter-outliers" checked />
+              Ocultar outliers (&gt; R$ 5.000)
+            </label>
+          </div>
+        </div>
+        <div id="chart-scatter" class="chart-container" style="height:500px"></div>
+      </div>
+    </section>
+
+    <!-- Rankings de eficiência -->
+    <section class="section">
+      <div class="efficiency-rankings">
+
+        <div class="eff-block">
+          <h3 class="ranking-label ranking-label--top">Mais eficientes — acima da curva</h3>
+          <p class="eff-subtitle">IDEB real muito acima do esperado para o per capita recebido</p>
+          <table class="ranking-table" id="table-efficient">
+            <thead>
+              <tr><th>#</th><th>Município</th><th>UF</th><th>Per capita</th><th>IDEB real</th><th>IDEB esperado</th><th>Resíduo</th></tr>
+            </thead>
+            <tbody><tr><td colspan="7" class="table-loading">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+
+        <div class="eff-block">
+          <h3 class="ranking-label ranking-label--bot">Menos eficientes — abaixo da curva</h3>
+          <p class="eff-subtitle">IDEB real muito abaixo do esperado para o per capita recebido</p>
+          <table class="ranking-table" id="table-inefficient">
+            <thead>
+              <tr><th>#</th><th>Município</th><th>UF</th><th>Per capita</th><th>IDEB real</th><th>IDEB esperado</th><th>Resíduo</th></tr>
+            </thead>
+            <tbody><tr><td colspan="7" class="table-loading">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
   </main>
+
+  <footer class="site-footer">
+    <p>Dados: FNDE (FUNDEB 2026) · INEP (IDEB 2023) · IBGE (Estimativas 2021)</p>
+    <p>Desenvolvido por <a href="https://linkedin.com/in/brunocordeirosantos" target="_blank">Bruno Cordeiro Santos</a> · Revenue Ops &amp; BI</p>
+  </footer>
+
   <script src="../assets/js/api.js"></script>
-  <script src="../assets/js/charts.js"></script>
-  <script src="../assets/js/filters.js"></script>
-  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/eficiencia.js"></script>
 </body>
 </html>

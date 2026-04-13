@@ -159,6 +159,74 @@ def get_ranking(
     return result
 
 
+def get_eficiencia(
+    uf: Optional[str] = None,
+    etapa: str = "iniciais",
+    per_capita_max: Optional[float] = 5000,
+) -> list[dict]:
+    df = _load().copy()
+    col_ideb = "ideb_anos_iniciais_2023" if etapa == "iniciais" else "ideb_anos_finais_2023"
+
+    df = df[df["total_receitas_per_capita"].notna() & df[col_ideb].notna()]
+    if uf:
+        df = df[df["uf"] == uf.upper()]
+    if per_capita_max:
+        df = df[df["total_receitas_per_capita"] <= per_capita_max]
+
+    if len(df) < 3:
+        return []
+
+    x = df["total_receitas_per_capita"]
+    y = df[col_ideb]
+    mx, my = float(x.mean()), float(y.mean())
+    b = float(((x - mx) * (y - my)).sum() / ((x - mx) ** 2).sum())
+    a = my - b * mx
+
+    df = df.copy()
+    df["ideb_esperado"] = (a + b * x).round(3)
+    df["residuo"] = (y - df["ideb_esperado"]).round(3)
+
+    max_abs = df["residuo"].abs().max()
+    df["score_eficiencia"] = ((df["residuo"] / max_abs * 100).round(1) if max_abs > 0 else 0.0)
+
+    df = df.sort_values("residuo", ascending=False)
+
+    return [
+        {
+            "cod_municipio": row["cod_municipio"],
+            "uf": row["uf"],
+            "nome_municipio": row["nome_municipio"],
+            "populacao": _nan_to_none(row.get("populacao")),
+            "total_receitas_per_capita": round(float(row["total_receitas_per_capita"]), 2),
+            "ideb_real": float(row[col_ideb]),
+            "ideb_esperado": float(row["ideb_esperado"]),
+            "residuo": float(row["residuo"]),
+            "score_eficiencia": float(row["score_eficiencia"]),
+        }
+        for _, row in df.iterrows()
+    ]
+
+
+def get_todas_ufs() -> list[dict]:
+    df = _load()
+    result = []
+    for uf in sorted(df["uf"].unique()):
+        sub = df[df["uf"] == uf]
+        pc = sub[sub["total_receitas_per_capita"].notna()]
+        ini = sub[sub["ideb_anos_iniciais_2023"].notna()]
+        fin = sub[sub["ideb_anos_finais_2023"].notna()]
+        result.append({
+            "uf": uf,
+            "total_municipios": len(sub),
+            "soma_receitas": round(float(sub["total_receitas"].sum()), 2),
+            "media_per_capita": round(float(pc["total_receitas_per_capita"].mean()), 2) if len(pc) else None,
+            "mediana_per_capita": round(float(pc["total_receitas_per_capita"].median()), 2) if len(pc) else None,
+            "media_ideb_iniciais": round(float(ini["ideb_anos_iniciais_2023"].mean()), 2) if len(ini) else None,
+            "media_ideb_finais": round(float(fin["ideb_anos_finais_2023"].mean()), 2) if len(fin) else None,
+        })
+    return result
+
+
 def get_medias_uf(uf: str) -> Optional[dict]:
     df = _load()
     sub = df[df["uf"] == uf.upper()]

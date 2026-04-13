@@ -24,11 +24,17 @@ async function init() {
 
   } catch (err) {
     console.error("Erro ao carregar dados:", err);
-    document.getElementById("kpi-grid").innerHTML =
-      `<p style="color:var(--color-danger);grid-column:1/-1">
-        Não foi possível conectar à API. Certifique-se de que o servidor está rodando em
-        <code>http://localhost:8000</code>.
-      </p>`;
+    document.getElementById("kpi-grid").innerHTML = `
+      <div class="api-alert">
+        <span class="api-alert-icon">⚠️</span>
+        <div class="api-alert-body">
+          <span class="api-alert-title">Não foi possível conectar à API</span>
+          <span class="api-alert-desc">
+            Verifique se o servidor está rodando em <code>http://localhost:8001</code>
+            ou se a URL de produção está configurada corretamente em <code>api.js</code>.
+          </span>
+        </div>
+      </div>`;
   }
 }
 

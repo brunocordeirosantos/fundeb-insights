@@ -4,8 +4,10 @@ from fastapi import APIRouter, HTTPException, Query
 
 from app.schemas.municipio import (
     CorrelacaoItem,
+    EficienciaItem,
     FiltrosDisponiveis,
     MediasUF,
+    MediasUFCompleta,
     MunicipioDetalhe,
     MunicipiosResponse,
     RankingItem,
@@ -62,6 +64,25 @@ def ranking(
     Use `ordem=asc` para os menores (bottom ranking).
     """
     return svc.get_ranking(uf=uf, limite=limite, ordem=ordem)
+
+
+@router.get("/eficiencia", response_model=list[EficienciaItem], summary="Eficiência relativa por município")
+def eficiencia(
+    uf: Optional[str] = Query(None, description="Filtrar por UF"),
+    etapa: str = Query("iniciais", pattern="^(iniciais|finais)$", description="Etapa do IDEB"),
+    per_capita_max: Optional[float] = Query(5000, description="Limite de per capita (remove outliers)"),
+):
+    """
+    Calcula o resíduo de regressão linear (IDEB real − IDEB esperado dado o per capita).
+    Municípios com resíduo positivo entregam mais do que o esperado para seu nível de investimento.
+    """
+    return svc.get_eficiencia(uf=uf, etapa=etapa, per_capita_max=per_capita_max)
+
+
+@router.get("/ufs", response_model=list[MediasUFCompleta], summary="Estatísticas de todos os estados")
+def todas_ufs():
+    """Retorna média de per capita, mediana, soma e IDEB para todos os 27 estados."""
+    return svc.get_todas_ufs()
 
 
 @router.get("/uf/{uf}", response_model=MediasUF, summary="Médias da UF para comparação")

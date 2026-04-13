@@ -3,29 +3,121 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FUNDEB Insights</title>
+  <title>FUNDEB Insights — Investimento vs Desempenho</title>
   <link rel="stylesheet" href="../assets/css/main.css" />
+  <link rel="stylesheet" href="../assets/css/desempenho.css" />
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 </head>
 <body>
+
   <header class="site-header">
     <nav class="nav">
       <span class="nav-logo">FUNDEB Insights</span>
       <ul class="nav-links">
         <li><a href="../index.html">Visão Executiva</a></li>
         <li><a href="distribuicao.html">Distribuição</a></li>
-        <li><a href="desempenho.html">Desempenho</a></li>
+        <li><a href="desempenho.html" class="active">Desempenho</a></li>
         <li><a href="eficiencia.html">Eficiência</a></li>
         <li><a href="municipio.html">Município</a></li>
         <li><a href="sobre.html">Sobre</a></li>
       </ul>
     </nav>
   </header>
+
   <main>
-    <!-- TODO: implement desempenho page -->
+
+    <section class="hero">
+      <div class="hero-badge">FUNDEB 2026 · IDEB 2023</div>
+      <h1>Investimento vs Desempenho</h1>
+      <p>Mais dinheiro do FUNDEB gera melhores notas no IDEB? A análise de <strong>5.596 municípios</strong> revela uma relação contraintuitiva — e o que ela realmente significa.</p>
+    </section>
+
+    <!-- KPIs -->
+    <section class="section">
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+      </div>
+    </section>
+
+    <!-- Callout do insight -->
+    <section class="section">
+      <div class="insight-callout" id="insight-callout">
+        <div class="insight-callout-left">
+          <div class="insight-r" id="insight-r">r = —</div>
+          <div class="insight-r-label">correlação de Pearson</div>
+        </div>
+        <div class="insight-callout-body">
+          <h3>O efeito redistributivo do FUNDEB</h3>
+          <p>
+            A correlação negativa não significa que investimento piora o desempenho.
+            O FUNDEB é redistributivo por design: municípios menores e mais pobres recebem
+            proporcionalmente mais por habitante — e são justamente esses que partem de níveis
+            mais baixos de IDEB, por razões estruturais que vão além do financiamento.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scatter principal -->
+    <section class="section">
+      <div class="chart-card">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Scatter: FUNDEB per capita × IDEB</h2>
+            <p class="section-subtitle" id="scatter-note">Cada ponto é um município</p>
+          </div>
+          <div class="chart-controls">
+            <select id="filter-uf" class="select-control">
+              <option value="">Todos os estados</option>
+            </select>
+            <select id="filter-etapa" class="select-control">
+              <option value="ideb_anos_iniciais_2023">Anos Iniciais</option>
+              <option value="ideb_anos_finais_2023">Anos Finais</option>
+            </select>
+            <label class="toggle-label">
+              <input type="checkbox" id="filter-outliers" checked />
+              Ocultar outliers (&gt; R$ 5.000)
+            </label>
+          </div>
+        </div>
+        <div id="chart-scatter" class="chart-container" style="height:500px"></div>
+      </div>
+    </section>
+
+    <!-- IDEB por estado -->
+    <section class="section">
+      <div class="chart-card">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">IDEB médio por estado</h2>
+            <p class="section-subtitle">Média dos municípios de cada UF — rede pública</p>
+          </div>
+          <div class="chart-controls">
+            <select id="filter-etapa-ufs" class="select-control">
+              <option value="media_ideb_iniciais">Anos Iniciais</option>
+              <option value="media_ideb_finais">Anos Finais</option>
+            </select>
+            <select id="filter-ordem-ufs" class="select-control">
+              <option value="desc">Maior → Menor</option>
+              <option value="asc">Menor → Maior</option>
+            </select>
+          </div>
+        </div>
+        <div id="chart-ideb-ufs" class="chart-container" style="height:520px"></div>
+      </div>
+    </section>
+
   </main>
+
+  <footer class="site-footer">
+    <p>Dados: FNDE (FUNDEB 2026) · INEP (IDEB 2023) · IBGE (Estimativas 2021)</p>
+    <p>Desenvolvido por <a href="https://linkedin.com/in/brunocordeirosantos" target="_blank">Bruno Cordeiro Santos</a> · Revenue Ops &amp; BI</p>
+  </footer>
+
   <script src="../assets/js/api.js"></script>
-  <script src="../assets/js/charts.js"></script>
-  <script src="../assets/js/filters.js"></script>
-  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/desempenho.js"></script>
 </body>
 </html>

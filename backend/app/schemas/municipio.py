@@ -75,6 +75,28 @@ class MediasUF(BaseModel):
     media_ideb_finais: Optional[float]
 
 
+class EficienciaItem(BaseModel):
+    cod_municipio: str
+    uf: str
+    nome_municipio: str
+    populacao: Optional[float]
+    total_receitas_per_capita: float
+    ideb_real: float
+    ideb_esperado: float
+    residuo: float
+    score_eficiencia: float
+
+
+class MediasUFCompleta(BaseModel):
+    uf: str
+    total_municipios: int
+    soma_receitas: float
+    media_per_capita: Optional[float]
+    mediana_per_capita: Optional[float]
+    media_ideb_iniciais: Optional[float]
+    media_ideb_finais: Optional[float]
+
+
 class PaginacaoMeta(BaseModel):
     total: int
     pagina: int
