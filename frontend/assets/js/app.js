@@ -59,9 +59,9 @@ function renderKpis(d) {
       cls: "accent",
     },
     {
-      label: "Média per capita",
-      value: new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(d.media_per_capita),
-      sub: `Mediana: ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(d.mediana_per_capita)}`,
+      label: "Mediana por aluno (rede municipal)",
+      value: new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(d.mediana_per_aluno_municipal),
+      sub: `Média: ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(d.media_per_aluno_municipal)} · per capita hab.: ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(d.media_per_capita)}`,
       cls: "primary",
     },
     {
@@ -108,13 +108,13 @@ async function renderCorrelacao() {
   const uf = document.getElementById("filter-uf").value || null;
   const etapa = document.getElementById("filter-etapa").value;
   const ocultarOutliers = document.getElementById("filter-outliers").checked;
-  const maxPc = ocultarOutliers ? 5000 : null;
+  const maxPc = ocultarOutliers ? 20000 : null;
 
   const data = await api.correlacao(uf, maxPc);
 
-  const x = data.map((d) => d.total_receitas_per_capita);
+  const x = data.map((d) => d.fundeb_per_aluno_municipal);
   const y = data.map((d) => d[etapa]);
-  const labels = data.map((d) => `${d.nome_municipio} (${d.uf})<br>Per capita: R$ ${fmtNum(d.total_receitas_per_capita)}<br>IDEB: ${d[etapa] ?? "—"}<br>Pop.: ${fmtNum(d.populacao)}`);
+  const labels = data.map((d) => `${d.nome_municipio} (${d.uf})<br>Por aluno: R$ ${fmtNum(d.fundeb_per_aluno_municipal)}<br>IDEB: ${d[etapa] ?? "—"}<br>Pop.: ${fmtNum(d.populacao)}`);
 
   const etapaLabel = etapa.includes("iniciais") ? "Anos Iniciais" : "Anos Finais";
 
@@ -147,7 +147,7 @@ async function renderCorrelacao() {
       plot_bgcolor: "#161b22",
       font: { color: "#8b949e", family: "Inter, system-ui, sans-serif", size: 12 },
       xaxis: {
-        title: { text: "Receita FUNDEB per capita (R$)", standoff: 12 },
+        title: { text: "FUNDEB por aluno — rede municipal (R$)", standoff: 12 },
         gridcolor: "#30363d",
         zerolinecolor: "#30363d",
         tickformat: ",.0f",
@@ -168,7 +168,7 @@ async function renderCorrelacao() {
   const n = data.filter((d) => d[etapa] !== null).length;
   const corr = pearson(x, y);
   document.getElementById("chart-note").textContent =
-    `${n.toLocaleString("pt-BR")} municípios plotados · correlação de Pearson r = ${corr.toFixed(3)} · ${ocultarOutliers ? "outliers (> R$ 5.000) ocultados" : "todos os valores incluídos"}`;
+    `${n.toLocaleString("pt-BR")} municípios plotados · correlação de Pearson r = ${corr.toFixed(3)} · ${ocultarOutliers ? "outliers (> R$ 20.000/aluno) ocultados" : "todos os valores incluídos"}`;
 }
 
 // ── Ranking tables ─────────────────────────────────────────────────────────────
@@ -187,7 +187,7 @@ function renderRankingTable(id, rows) {
   el.innerHTML = `
     <thead>
       <tr>
-        <th>#</th><th>Município</th><th>UF</th><th>Per capita</th><th>IDEB</th>
+        <th>#</th><th>Município</th><th>UF</th><th>Por aluno (mun.)</th><th>IDEB</th>
       </tr>
     </thead>
     <tbody>
@@ -198,7 +198,7 @@ function renderRankingTable(id, rows) {
           <td class="rank-pos">${r.posicao}</td>
           <td>${r.nome_municipio}</td>
           <td>${r.uf}</td>
-          <td class="rank-value">R$ ${fmtNum(r.total_receitas_per_capita)}</td>
+          <td class="rank-value">R$ ${fmtNum(r.fundeb_per_aluno_municipal)}</td>
           <td>${r.ideb_anos_iniciais_2023 ?? "—"}</td>
         </tr>`
         )

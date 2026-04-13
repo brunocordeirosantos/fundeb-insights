@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FUNDEB Insights — Análise Estadual</title>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <link rel="stylesheet" href="../assets/css/estados.css" />
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <nav class="nav">
+      <span class="nav-logo">FUNDEB Insights</span>
+      <ul class="nav-links">
+        <li><a href="../index.html">Visão Executiva</a></li>
+        <li><a href="distribuicao.html">Distribuição</a></li>
+        <li><a href="desempenho.html">Desempenho</a></li>
+        <li><a href="eficiencia.html">Eficiência</a></li>
+        <li><a href="estados.html" class="active">Estados</a></li>
+        <li><a href="municipio.html">Município</a></li>
+        <li><a href="sobre.html">Sobre</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <div class="hero-badge">Rede Estadual · Rede Municipal · Comparativo</div>
+      <h1>Análise por Estado</h1>
+      <p>
+        O FUNDEB financia redes distintas: <strong>municípios gerem suas escolas</strong> com
+        sua fatia do fundo; <strong>estados gerem as deles</strong> com a fatia própria.
+        Esta página compara o investimento por aluno entre as duas redes para os 27 estados.
+      </p>
+    </section>
+
+    <!-- Callout metodológico -->
+    <section class="section">
+      <div class="method-callout">
+        <div class="method-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <div class="method-body">
+          <h3>Como ler o indicador de razão</h3>
+          <p>
+            A <strong>razão per aluno</strong> divide o investimento estadual pela <em>mediana</em> do investimento municipal
+            no mesmo estado. Usamos mediana (não média) porque municípios muito pequenos recebem valores
+            extremos que distorcem a média sem representar a realidade típica.
+            Razão <strong>&gt; 1,0</strong> → estado investe mais por aluno que o município mediano.
+            Razão <strong>&lt; 1,0</strong> → municípios investem mais.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- KPIs nacionais -->
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Panorama nacional</h2>
+          <p class="section-subtitle">FUNDEB 2026 · Censo Escolar 2023</p>
+        </div>
+      </div>
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+      </div>
+    </section>
+
+    <!-- Gráfico comparativo: barras agrupadas estadual vs municipal -->
+    <section class="section">
+      <div class="chart-card">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Investimento por aluno: rede estadual vs. rede municipal</h2>
+            <p class="section-subtitle" id="chart-bar-note">Mediana do investimento municipal por estado</p>
+          </div>
+          <div class="chart-controls">
+            <select id="filter-regiao" class="select-control">
+              <option value="">Todas as regiões</option>
+              <option value="Norte">Norte</option>
+              <option value="Nordeste">Nordeste</option>
+              <option value="Sudeste">Sudeste</option>
+              <option value="Sul">Sul</option>
+              <option value="Centro-Oeste">Centro-Oeste</option>
+            </select>
+            <select id="filter-ordem-bar" class="select-control">
+              <option value="estadual_desc">Maior estadual</option>
+              <option value="estadual_asc">Menor estadual</option>
+              <option value="razao_desc">Maior razão</option>
+              <option value="razao_asc">Menor razão</option>
+              <option value="uf_asc">Alfabética</option>
+            </select>
+          </div>
+        </div>
+        <div id="chart-bar" class="chart-container" style="height:520px"></div>
+        <p class="chart-note">
+          Barras azuis = rede estadual · Barras verdes = mediana da rede municipal.
+          A linha pontilhada marca a paridade (razão = 1,0).
+        </p>
+      </div>
+    </section>
+
+    <!-- Scatter: per aluno estadual × IDEB -->
+    <section class="section">
+      <div class="chart-card">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Investimento estadual × IDEB médio</h2>
+            <p class="section-subtitle">Cada ponto é um estado — cor indica a região</p>
+          </div>
+        </div>
+        <div id="chart-scatter" class="chart-container" style="height:460px"></div>
+        <p class="chart-note">
+          Investimento = FUNDEB recebido pelo governo estadual ÷ matrículas na rede estadual (Censo Escolar 2023).
+          IDEB = média dos municípios do estado (Anos Iniciais 2023).
+        </p>
+      </div>
+    </section>
+
+    <!-- Tabela completa -->
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Todos os estados</h2>
+          <p class="section-subtitle" id="table-note">Clique em um estado para ver o detalhamento</p>
+        </div>
+        <div class="chart-controls">
+          <select id="filter-regiao-table" class="select-control">
+            <option value="">Todas as regiões</option>
+            <option value="Norte">Norte</option>
+            <option value="Nordeste">Nordeste</option>
+            <option value="Sudeste">Sudeste</option>
+            <option value="Sul">Sul</option>
+            <option value="Centro-Oeste">Centro-Oeste</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="estados-table" id="estados-table">
+          <thead>
+            <tr>
+              <th data-col="uf" class="sortable">UF <span class="sort-icon">↕</span></th>
+              <th data-col="nome_estado" class="sortable">Estado <span class="sort-icon">↕</span></th>
+              <th>Região</th>
+              <th data-col="fundeb_per_aluno_estadual" class="sortable num">R$/aluno estadual <span class="sort-icon">↕</span></th>
+              <th data-col="mediana_per_aluno_municipal" class="sortable num">Mediana municipal <span class="sort-icon">↕</span></th>
+              <th data-col="razao_per_aluno" class="sortable num">Razão <span class="sort-icon">↕</span></th>
+              <th data-col="pct_mat_estadual" class="sortable num">% alunos estado <span class="sort-icon">↕</span></th>
+              <th data-col="media_ideb_iniciais" class="sortable num">IDEB médio <span class="sort-icon">↕</span></th>
+            </tr>
+          </thead>
+          <tbody id="estados-tbody">
+            <tr><td colspan="8" class="table-loading">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Painel de detalhes do estado selecionado -->
+    <section class="section" id="detail-panel" style="display:none">
+      <div class="detail-card">
+        <div class="detail-header">
+          <div class="detail-uf-badge" id="detail-uf">--</div>
+          <div>
+            <h2 class="detail-title" id="detail-nome">—</h2>
+            <p class="detail-regiao" id="detail-regiao">—</p>
+          </div>
+          <button class="detail-close" id="detail-close" aria-label="Fechar">✕</button>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-block">
+            <div class="detail-block-title">Rede Estadual</div>
+            <div class="detail-row"><span>FUNDEB recebido</span><strong id="d-fundeb-est">—</strong></div>
+            <div class="detail-row"><span>Matrículas rede estadual</span><strong id="d-mat-est">—</strong></div>
+            <div class="detail-row"><span>Investimento por aluno</span><strong id="d-per-aluno-est" class="highlight-primary">—</strong></div>
+            <div class="detail-row"><span>Complementação federal</span><strong id="d-comp-uniao">—</strong></div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-block-title">Rede Municipal (agregado dos municípios)</div>
+            <div class="detail-row"><span>FUNDEB total municípios</span><strong id="d-fundeb-mun">—</strong></div>
+            <div class="detail-row"><span>Matrículas rede municipal</span><strong id="d-mat-mun">—</strong></div>
+            <div class="detail-row"><span>Investimento por aluno (mediana)</span><strong id="d-per-aluno-mun" class="highlight-accent">—</strong></div>
+            <div class="detail-row"><span>Número de municípios</span><strong id="d-n-mun">—</strong></div>
+          </div>
+          <div class="detail-block detail-block--full">
+            <div class="detail-block-title">Distribuição de matrículas públicas</div>
+            <div class="detail-dist" id="d-dist-bar"></div>
+            <div class="detail-row"><span>% gerida pelo estado</span><strong id="d-pct-est">—</strong></div>
+            <div class="detail-row"><span>IDEB médio dos municípios</span><strong id="d-ideb">—</strong></div>
+            <div class="detail-row"><span>Razão estado ÷ mediana municipal</span><strong id="d-razao">—</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Dados: FNDE (FUNDEB 2026) · INEP Censo Escolar (2023) · INEP IDEB (2023)</p>
+    <p>Desenvolvido por <a href="https://linkedin.com/in/brunocordeirosantos" target="_blank">Bruno Cordeiro Santos</a> · Revenue Ops &amp; BI</p>
+  </footer>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/estados.js"></script>
+</body>
+</html>

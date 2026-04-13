@@ -15,6 +15,7 @@ async function apiFetch(endpoint, params = {}) {
 }
 
 const api = {
+  // Municípios
   resumo:     ()               => apiFetch("/api/resumo"),
   filtros:    ()               => apiFetch("/api/filtros"),
   municipios: (uf, nome, p=1, pp=50) => apiFetch("/api/municipios", { uf, nome, pagina: p, por_pagina: pp }),
@@ -24,4 +25,10 @@ const api = {
   ufStats:    (uf)             => uf ? apiFetch(`/api/uf/${uf}`) : Promise.resolve(null),
   ranking:    (uf, limite=10, ordem="desc") => apiFetch("/api/ranking", { uf, limite, ordem }),
   correlacao: (uf, per_capita_max) => apiFetch("/api/correlacao", { uf, per_capita_max }),
+  // Estados
+  estadosResumo:      ()           => apiFetch("/api/estados/resumo"),
+  estadosLista:       (regiao)     => apiFetch("/api/estados", { regiao }),
+  estadosRanking:     (metrica, ordem, regiao) => apiFetch("/api/estados/ranking", { metrica, ordem, regiao }),
+  estadosComparativo: ()           => apiFetch("/api/estados/comparativo"),
+  estadoDetalhe:      (uf)         => apiFetch(`/api/estados/${uf}`),
 };

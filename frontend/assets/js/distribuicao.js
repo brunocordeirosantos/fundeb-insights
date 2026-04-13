@@ -51,9 +51,8 @@ function renderKpis(resumo, ufs) {
   const fmtPC = (n) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(n);
 
-  const pcValues = ufs.map(u => u.media_per_capita).filter(v => v !== null);
-  const ufMax = ufs.reduce((a, b) => (b.media_per_capita > (a.media_per_capita ?? 0) ? b : a), ufs[0]);
-  const ufMin = ufs.filter(u => u.media_per_capita).reduce((a, b) => (b.media_per_capita < a.media_per_capita ? b : a));
+  const ufMax = ufs.filter(u => u.media_per_aluno_municipal).reduce((a, b) => (b.media_per_aluno_municipal > (a.media_per_aluno_municipal ?? 0) ? b : a), ufs[0]);
+  const ufMin = ufs.filter(u => u.media_per_aluno_municipal).reduce((a, b) => (b.media_per_aluno_municipal < a.media_per_aluno_municipal ? b : a));
 
   const cards = [
     {
@@ -63,21 +62,21 @@ function renderKpis(resumo, ufs) {
       cls: "accent",
     },
     {
-      label: "Média per capita nacional",
-      value: fmtPC(resumo.media_per_capita),
-      sub: `Mediana: ${fmtPC(resumo.mediana_per_capita)}`,
+      label: "Mediana por aluno (rede municipal)",
+      value: fmtPC(resumo.mediana_per_aluno_municipal),
+      sub: `Média: ${fmtPC(resumo.media_per_aluno_municipal)} · per capita hab.: ${fmtPC(resumo.media_per_capita)}`,
       cls: "primary",
     },
     {
-      label: "Estado com maior média",
+      label: "Estado com maior média por aluno",
       value: ufMax.uf,
-      sub: `${fmtPC(ufMax.media_per_capita)} por habitante`,
+      sub: `${fmtPC(ufMax.media_per_aluno_municipal)} por aluno (rede municipal)`,
       cls: "warn",
     },
     {
-      label: "Estado com menor média",
+      label: "Estado com menor média por aluno",
       value: ufMin.uf,
-      sub: `${fmtPC(ufMin.media_per_capita)} por habitante`,
+      sub: `${fmtPC(ufMin.media_per_aluno_municipal)} por aluno (rede municipal)`,
       cls: "",
     },
   ];
@@ -109,9 +108,11 @@ function renderChartUfs() {
   const tickPrefix = isMonetary ? "R$ " : "";
 
   const metricaLabels = {
-    media_per_capita: "Média per capita (R$)",
-    mediana_per_capita: "Mediana per capita (R$)",
+    media_per_aluno_municipal: "Média por aluno — rede municipal (R$)",
+    mediana_per_aluno_municipal: "Mediana por aluno — rede municipal (R$)",
     soma_receitas: "Total FUNDEB (R$)",
+    media_per_capita: "Média per capita — população (R$)",
+    mediana_per_capita: "Mediana per capita — população (R$)",
   };
 
   // Color gradient: green (high) → yellow → red (low)
@@ -189,7 +190,7 @@ async function renderRanking() {
         <td>${r.uf}</td>
         <td>${r.populacao ? fmtNum(r.populacao) : "—"}</td>
         <td>${fmtCurrency(r.total_receitas)}</td>
-        <td class="rank-value">${r.total_receitas_per_capita ? fmtCurrency(r.total_receitas_per_capita) : "—"}</td>
+        <td class="rank-value">${r.fundeb_per_aluno_municipal ? fmtCurrency(r.fundeb_per_aluno_municipal) : "—"}</td>
         <td>${r.ideb_anos_iniciais_2023 ?? "—"}</td>
       </tr>`).join("");
   } catch (err) {

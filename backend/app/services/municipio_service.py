@@ -2,8 +2,16 @@
 MunicipioService — loads base_municipal_mvp.csv into memory at startup
 and provides all query methods consumed by the API routes.
 
-Designed to be swapped for a SQLAlchemy/PostgreSQL implementation
-when the database layer is ready, without changing the route handlers.
+Primary investment metric: fundeb_per_aluno_municipal
+    FUNDEB total received by the municipality divided by the number of students
+    enrolled in the municipal school network (rede municipal). This is the
+    correct denominator because municipal FUNDEB funds finance municipal schools
+    directly. State schools (rede estadual) are financed by the state's own
+    FUNDEB share and must not be mixed into the municipal per-student calculation.
+
+Context metric: total_receitas_per_capita
+    FUNDEB divided by total population. Kept for reference and geographic
+    comparisons but should not be used as a proxy for educational investment.
 """
 
 import math
@@ -15,6 +23,9 @@ import pandas as pd
 
 BASE_PATH = Path(__file__).parents[3] / "data" / "processed" / "base_municipal_mvp.csv"
 
+METRIC_PER_ALUNO = "fundeb_per_aluno_municipal"
+METRIC_PER_CAPITA = "total_receitas_per_capita"
+
 
 @lru_cache(maxsize=1)
 def _load() -> pd.DataFrame:
@@ -25,7 +36,7 @@ def _load() -> pd.DataFrame:
     return df
 
 
-def _nan_to_none(value):
+def _nan_to_none(value) -> Optional[float]:
     if value is None:
         return None
     try:
@@ -40,7 +51,8 @@ def _row_to_resumo(row: pd.Series) -> dict:
         "uf": row["uf"],
         "nome_municipio": row["nome_municipio"],
         "total_receitas": float(row["total_receitas"]),
-        "total_receitas_per_capita": _nan_to_none(row.get("total_receitas_per_capita")),
+        "fundeb_per_aluno_municipal": _nan_to_none(row.get(METRIC_PER_ALUNO)),
+        "total_receitas_per_capita": _nan_to_none(row.get(METRIC_PER_CAPITA)),
         "ideb_anos_iniciais_2023": _nan_to_none(row.get("ideb_anos_iniciais_2023")),
         "ideb_anos_finais_2023": _nan_to_none(row.get("ideb_anos_finais_2023")),
     }
@@ -51,10 +63,14 @@ def _row_to_detalhe(row: pd.Series) -> dict:
         **_row_to_resumo(row),
         "ano": int(row["ano"]),
         "populacao": _nan_to_none(row.get("populacao")),
+        "mat_municipal_total": _nan_to_none(row.get("mat_municipal_total")),
+        "mat_estadual_total": _nan_to_none(row.get("mat_estadual_total")),
+        "mat_publica_total": _nan_to_none(row.get("mat_publica_total")),
+        "fundeb_per_aluno_publica": _nan_to_none(row.get("fundeb_per_aluno_publica")),
         "receita_contribuicao": float(row["receita_contribuicao"]),
         "comp_vaaf": float(row["comp_vaaf"]),
         "comp_vaat": float(row["comp_vaat"]),
-        "comp_vaar": float(row["comp_vaar"]),
+        "comp_vaar": float(row["comp_uniao_total"]),
         "comp_uniao_total": float(row["comp_uniao_total"]),
     }
 
@@ -64,17 +80,21 @@ def _row_to_detalhe(row: pd.Series) -> dict:
 def get_resumo() -> dict:
     df = _load()
     com_ideb = df["ideb_anos_iniciais_2023"].notna().sum()
-    sem_pop = df["populacao"].isna().sum()
-    df_pc = df[df["total_receitas_per_capita"].notna()]
+
+    df_pa = df[df[METRIC_PER_ALUNO].notna()]
+    df_pc = df[df[METRIC_PER_CAPITA].notna()]
+    sem_mat = df["mat_municipal_total"].isna().sum() if "mat_municipal_total" in df.columns else 0
 
     return {
         "total_municipios": len(df),
         "total_municipios_com_ideb": int(com_ideb),
-        "total_municipios_sem_populacao": int(sem_pop),
+        "total_municipios_sem_matriculas": int(sem_mat),
         "ufs_disponiveis": df["uf"].nunique(),
         "soma_total_receitas": round(float(df["total_receitas"].sum()), 2),
-        "media_per_capita": round(float(df_pc["total_receitas_per_capita"].mean()), 2),
-        "mediana_per_capita": round(float(df_pc["total_receitas_per_capita"].median()), 2),
+        "media_per_aluno_municipal": round(float(df_pa[METRIC_PER_ALUNO].mean()), 2),
+        "mediana_per_aluno_municipal": round(float(df_pa[METRIC_PER_ALUNO].median()), 2),
+        "media_per_capita": round(float(df_pc[METRIC_PER_CAPITA].mean()), 2),
+        "mediana_per_capita": round(float(df_pc[METRIC_PER_CAPITA].median()), 2),
         "media_ideb_iniciais": round(float(df["ideb_anos_iniciais_2023"].mean()), 2),
         "media_ideb_finais": round(float(df["ideb_anos_finais_2023"].mean()), 2),
         "ano_fundeb": int(df["ano"].iloc[0]),
@@ -84,15 +104,18 @@ def get_resumo() -> dict:
 
 def get_filtros() -> dict:
     df = _load()
-    df_pc = df[df["total_receitas_per_capita"].notna()]
+    df_pa = df[df[METRIC_PER_ALUNO].notna()]
+    df_pc = df[df[METRIC_PER_CAPITA].notna()]
     df_ideb = df[df["ideb_anos_iniciais_2023"].notna()]
 
     return {
         "ufs": sorted(df["uf"].unique().tolist()),
         "ano_fundeb": int(df["ano"].iloc[0]),
         "ano_ideb": 2023,
-        "per_capita_min": round(float(df_pc["total_receitas_per_capita"].min()), 2),
-        "per_capita_max": round(float(df_pc["total_receitas_per_capita"].max()), 2),
+        "per_aluno_min": round(float(df_pa[METRIC_PER_ALUNO].min()), 2),
+        "per_aluno_max": round(float(df_pa[METRIC_PER_ALUNO].max()), 2),
+        "per_capita_min": round(float(df_pc[METRIC_PER_CAPITA].min()), 2),
+        "per_capita_max": round(float(df_pc[METRIC_PER_CAPITA].max()), 2),
         "ideb_min": round(float(df_ideb["ideb_anos_iniciais_2023"].min()), 2),
         "ideb_max": round(float(df_ideb["ideb_anos_iniciais_2023"].max()), 2),
     }
@@ -141,42 +164,57 @@ def get_ranking(
     limite: int = 20,
     ordem: str = "desc",
 ) -> list[dict]:
-    df = _load()[_load()["total_receitas_per_capita"].notna()].copy()
+    df = _load()
+    df = df[df[METRIC_PER_ALUNO].notna()].copy()
 
     if uf:
         df = df[df["uf"] == uf.upper()]
 
     ascending = ordem == "asc"
-    df = df.sort_values("total_receitas_per_capita", ascending=ascending).head(limite)
+    df = df.sort_values(METRIC_PER_ALUNO, ascending=ascending).head(limite)
 
-    result = []
-    for posicao, (_, row) in enumerate(df.iterrows(), start=1):
-        result.append({
-            "posicao": posicao,
-            **_row_to_resumo(row),
+    return [
+        {
+            "posicao": pos,
+            "cod_municipio": row["cod_municipio"],
+            "uf": row["uf"],
+            "nome_municipio": row["nome_municipio"],
+            "total_receitas": float(row["total_receitas"]),
+            "mat_municipal_total": _nan_to_none(row.get("mat_municipal_total")),
+            "fundeb_per_aluno_municipal": _nan_to_none(row[METRIC_PER_ALUNO]),
+            "total_receitas_per_capita": _nan_to_none(row.get(METRIC_PER_CAPITA)),
             "populacao": _nan_to_none(row.get("populacao")),
-        })
-    return result
+            "ideb_anos_iniciais_2023": _nan_to_none(row.get("ideb_anos_iniciais_2023")),
+        }
+        for pos, (_, row) in enumerate(df.iterrows(), start=1)
+    ]
 
 
 def get_eficiencia(
     uf: Optional[str] = None,
     etapa: str = "iniciais",
-    per_capita_max: Optional[float] = 5000,
+    per_capita_max: Optional[float] = None,
 ) -> list[dict]:
+    """
+    Calculates the regression residual (actual IDEB − expected IDEB given investment).
+    Investment is measured by fundeb_per_aluno_municipal.
+    Municipalities with positive residual deliver more than expected for their funding level.
+
+    per_capita_max: optional upper bound on fundeb_per_aluno_municipal to exclude extreme outliers.
+    """
     df = _load().copy()
     col_ideb = "ideb_anos_iniciais_2023" if etapa == "iniciais" else "ideb_anos_finais_2023"
 
-    df = df[df["total_receitas_per_capita"].notna() & df[col_ideb].notna()]
+    df = df[df[METRIC_PER_ALUNO].notna() & df[col_ideb].notna()]
     if uf:
         df = df[df["uf"] == uf.upper()]
     if per_capita_max:
-        df = df[df["total_receitas_per_capita"] <= per_capita_max]
+        df = df[df[METRIC_PER_ALUNO] <= per_capita_max]
 
     if len(df) < 3:
         return []
 
-    x = df["total_receitas_per_capita"]
+    x = df[METRIC_PER_ALUNO]
     y = df[col_ideb]
     mx, my = float(x.mean()), float(y.mean())
     b = float(((x - mx) * (y - my)).sum() / ((x - mx) ** 2).sum())
@@ -187,7 +225,7 @@ def get_eficiencia(
     df["residuo"] = (y - df["ideb_esperado"]).round(3)
 
     max_abs = df["residuo"].abs().max()
-    df["score_eficiencia"] = ((df["residuo"] / max_abs * 100).round(1) if max_abs > 0 else 0.0)
+    df["score_eficiencia"] = (df["residuo"] / max_abs * 100).round(1) if max_abs > 0 else 0.0
 
     df = df.sort_values("residuo", ascending=False)
 
@@ -197,7 +235,9 @@ def get_eficiencia(
             "uf": row["uf"],
             "nome_municipio": row["nome_municipio"],
             "populacao": _nan_to_none(row.get("populacao")),
-            "total_receitas_per_capita": round(float(row["total_receitas_per_capita"]), 2),
+            "mat_municipal_total": _nan_to_none(row.get("mat_municipal_total")),
+            "fundeb_per_aluno_municipal": round(float(row[METRIC_PER_ALUNO]), 2),
+            "total_receitas_per_capita": _nan_to_none(row.get(METRIC_PER_CAPITA)),
             "ideb_real": float(row[col_ideb]),
             "ideb_esperado": float(row["ideb_esperado"]),
             "residuo": float(row["residuo"]),
@@ -212,15 +252,18 @@ def get_todas_ufs() -> list[dict]:
     result = []
     for uf in sorted(df["uf"].unique()):
         sub = df[df["uf"] == uf]
-        pc = sub[sub["total_receitas_per_capita"].notna()]
+        pa = sub[sub[METRIC_PER_ALUNO].notna()]
+        pc = sub[sub[METRIC_PER_CAPITA].notna()]
         ini = sub[sub["ideb_anos_iniciais_2023"].notna()]
         fin = sub[sub["ideb_anos_finais_2023"].notna()]
         result.append({
             "uf": uf,
             "total_municipios": len(sub),
             "soma_receitas": round(float(sub["total_receitas"].sum()), 2),
-            "media_per_capita": round(float(pc["total_receitas_per_capita"].mean()), 2) if len(pc) else None,
-            "mediana_per_capita": round(float(pc["total_receitas_per_capita"].median()), 2) if len(pc) else None,
+            "media_per_aluno_municipal": round(float(pa[METRIC_PER_ALUNO].mean()), 2) if len(pa) else None,
+            "mediana_per_aluno_municipal": round(float(pa[METRIC_PER_ALUNO].median()), 2) if len(pa) else None,
+            "media_per_capita": round(float(pc[METRIC_PER_CAPITA].mean()), 2) if len(pc) else None,
+            "mediana_per_capita": round(float(pc[METRIC_PER_CAPITA].median()), 2) if len(pc) else None,
             "media_ideb_iniciais": round(float(ini["ideb_anos_iniciais_2023"].mean()), 2) if len(ini) else None,
             "media_ideb_finais": round(float(fin["ideb_anos_finais_2023"].mean()), 2) if len(fin) else None,
         })
@@ -232,13 +275,15 @@ def get_medias_uf(uf: str) -> Optional[dict]:
     sub = df[df["uf"] == uf.upper()]
     if sub.empty:
         return None
-    pc = sub[sub["total_receitas_per_capita"].notna()]
+    pa = sub[sub[METRIC_PER_ALUNO].notna()]
+    pc = sub[sub[METRIC_PER_CAPITA].notna()]
     ini = sub[sub["ideb_anos_iniciais_2023"].notna()]
     fin = sub[sub["ideb_anos_finais_2023"].notna()]
     return {
         "uf": uf.upper(),
         "total_municipios": len(sub),
-        "media_per_capita": round(float(pc["total_receitas_per_capita"].mean()), 2) if len(pc) else None,
+        "media_per_aluno_municipal": round(float(pa[METRIC_PER_ALUNO].mean()), 2) if len(pa) else None,
+        "media_per_capita": round(float(pc[METRIC_PER_CAPITA].mean()), 2) if len(pc) else None,
         "media_ideb_iniciais": round(float(ini["ideb_anos_iniciais_2023"].mean()), 2) if len(ini) else None,
         "media_ideb_finais": round(float(fin["ideb_anos_finais_2023"].mean()), 2) if len(fin) else None,
     }
@@ -248,22 +293,29 @@ def get_correlacao(
     uf: Optional[str] = None,
     per_capita_max: Optional[float] = None,
 ) -> list[dict]:
+    """
+    Returns data points for the investment × performance scatter chart.
+    X-axis: fundeb_per_aluno_municipal (primary investment metric).
+    per_capita_max applied to fundeb_per_aluno_municipal for outlier exclusion.
+    """
     df = _load().copy()
-    df = df[df["total_receitas_per_capita"].notna() & df["ideb_anos_iniciais_2023"].notna()]
+    df = df[df[METRIC_PER_ALUNO].notna() & df["ideb_anos_iniciais_2023"].notna()]
 
     if uf:
         df = df[df["uf"] == uf.upper()]
     if per_capita_max:
-        df = df[df["total_receitas_per_capita"] <= per_capita_max]
+        df = df[df[METRIC_PER_ALUNO] <= per_capita_max]
 
     return [
         {
             "cod_municipio": row["cod_municipio"],
             "uf": row["uf"],
             "nome_municipio": row["nome_municipio"],
-            "total_receitas_per_capita": round(float(row["total_receitas_per_capita"]), 2),
+            "fundeb_per_aluno_municipal": round(float(row[METRIC_PER_ALUNO]), 2),
+            "total_receitas_per_capita": _nan_to_none(row.get(METRIC_PER_CAPITA)),
             "ideb_anos_iniciais_2023": _nan_to_none(row["ideb_anos_iniciais_2023"]),
             "ideb_anos_finais_2023": _nan_to_none(row["ideb_anos_finais_2023"]),
+            "mat_municipal_total": _nan_to_none(row.get("mat_municipal_total")),
             "populacao": _nan_to_none(row.get("populacao")),
         }
         for _, row in df.iterrows()

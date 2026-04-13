@@ -4,7 +4,7 @@
  */
 
 // National averages loaded once from /api/resumo
-let nationalAvg = { per_capita: 0, ideb_iniciais: 0, ideb_finais: 0 };
+let nationalAvg = { per_aluno: 0, ideb_iniciais: 0, ideb_finais: 0 };
 
 document.addEventListener("DOMContentLoaded", init);
 
@@ -13,7 +13,7 @@ async function init() {
     const [resumo, filtros] = await Promise.all([api.resumo(), api.filtros()]);
 
     nationalAvg = {
-      per_capita: resumo.media_per_capita,
+      per_aluno: resumo.media_per_aluno_municipal,
       ideb_iniciais: resumo.media_ideb_iniciais,
       ideb_finais: resumo.media_ideb_finais,
     };
@@ -104,7 +104,7 @@ function renderSuggestions(items) {
         <span class="ac-name">${m.nome_municipio}</span>
         <span class="ac-uf">${m.uf}</span>
       </div>
-      <span class="ac-pc">R$ ${fmtNum(m.total_receitas_per_capita)} / hab</span>
+      <span class="ac-pc">R$ ${fmtNum(m.fundeb_per_aluno_municipal)} / aluno</span>
     </div>`
   ).join("");
 
@@ -147,18 +147,18 @@ function renderCard(m, uf) {
 
   // Financial
   document.getElementById("fin-total").textContent        = fmtBRL(m.total_receitas);
-  document.getElementById("fin-per-capita").textContent   = m.total_receitas_per_capita ? fmtBRL(m.total_receitas_per_capita) + " / hab" : "—";
+  document.getElementById("fin-per-capita").textContent   = m.fundeb_per_aluno_municipal ? fmtBRL(m.fundeb_per_aluno_municipal) + " / aluno" : "—";
   document.getElementById("fin-contribuicao").textContent = fmtBRL(m.receita_contribuicao);
   document.getElementById("fin-vaaf").textContent         = m.comp_vaaf  ? fmtBRL(m.comp_vaaf)  : "—";
   document.getElementById("fin-vaat").textContent         = m.comp_vaat  ? fmtBRL(m.comp_vaat)  : "—";
   document.getElementById("fin-vaar").textContent         = m.comp_vaar  ? fmtBRL(m.comp_vaar)  : "—";
   document.getElementById("fin-uniao").textContent        = m.comp_uniao_total ? fmtBRL(m.comp_uniao_total) : "—";
 
-  // Per capita comparison bars
-  renderComparisons("pc-comparisons", m.total_receitas_per_capita, [
-    { label: `Média ${m.uf}`, value: uf?.media_per_capita },
-    { label: "Média nacional", value: nationalAvg.per_capita },
-  ], 0, Math.max(nationalAvg.per_capita * 3, m.total_receitas_per_capita * 1.2));
+  // Per aluno comparison bars
+  renderComparisons("pc-comparisons", m.fundeb_per_aluno_municipal, [
+    { label: `Mediana ${m.uf}`, value: uf?.mediana_per_aluno_municipal },
+    { label: "Mediana nacional", value: nationalAvg.per_aluno },
+  ], 0, Math.max(nationalAvg.per_aluno * 3, (m.fundeb_per_aluno_municipal ?? 0) * 1.2));
 
   // IDEB scores
   renderIdebCard("ideb-iniciais-card", "ideb-iniciais", m.ideb_anos_iniciais_2023, nationalAvg.ideb_iniciais);

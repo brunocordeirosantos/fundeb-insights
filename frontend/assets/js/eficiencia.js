@@ -33,7 +33,7 @@ async function init() {
 async function load() {
   const uf     = document.getElementById("filter-uf").value || null;
   const etapa  = document.getElementById("filter-etapa").value;
-  const maxPc  = document.getElementById("filter-outliers").checked ? 5000 : null;
+  const maxPc  = document.getElementById("filter-outliers").checked ? 20000 : null;
 
   efData = await api.eficiencia(uf, etapa, maxPc);
 
@@ -102,11 +102,11 @@ function renderScatter(data, etapa) {
     type: "scatter",
     mode: "markers",
     name: "Municípios",
-    x: data.map(d => d.total_receitas_per_capita),
+    x: data.map(d => d.fundeb_per_aluno_municipal),
     y: data.map(d => d.ideb_real),
     text: data.map(d =>
       `<b>${d.nome_municipio} (${d.uf})</b><br>` +
-      `Per capita: R$ ${fmtNum(d.total_receitas_per_capita)}<br>` +
+      `Por aluno: R$ ${fmtNum(d.fundeb_per_aluno_municipal)}<br>` +
       `IDEB real: ${d.ideb_real.toFixed(2)}<br>` +
       `IDEB esperado: ${d.ideb_esperado.toFixed(2)}<br>` +
       `Resíduo: ${d.residuo >= 0 ? "+" : ""}${d.residuo.toFixed(2)}`
@@ -128,12 +128,12 @@ function renderScatter(data, etapa) {
   };
 
   // Linha de regressão
-  const xSorted = [...data.map(d => d.total_receitas_per_capita)].sort((a, b) => a - b);
+  const xSorted = [...data.map(d => d.fundeb_per_aluno_municipal)].sort((a, b) => a - b);
   const xMin = xSorted[0];
   const xMax = xSorted[xSorted.length - 1];
 
   // Recalcular a e b no frontend para desenhar a linha
-  const xs = data.map(d => d.total_receitas_per_capita);
+  const xs = data.map(d => d.fundeb_per_aluno_municipal);
   const ys = data.map(d => d.ideb_esperado);
   const regLine = {
     type: "scatter",
@@ -153,7 +153,7 @@ function renderScatter(data, etapa) {
       plot_bgcolor: "#161b22",
       font: { color: "#8b949e", family: "Inter, system-ui, sans-serif", size: 12 },
       xaxis: {
-        title: { text: "Receita FUNDEB per capita (R$)", standoff: 12 },
+        title: { text: "FUNDEB por aluno — rede municipal (R$)", standoff: 12 },
         gridcolor: "#30363d", zerolinecolor: "#30363d",
         tickformat: ",.0f", tickprefix: "R$ ",
       },
@@ -192,7 +192,7 @@ function fillTable(id, rows, startPos) {
       <td class="rank-pos">${i + startPos}</td>
       <td><a href="municipio.html?cod=${r.cod_municipio}">${r.nome_municipio}</a></td>
       <td>${r.uf}</td>
-      <td>R$ ${fmtNum(r.total_receitas_per_capita)}</td>
+      <td>R$ ${fmtNum(r.fundeb_per_aluno_municipal)}</td>
       <td>${r.ideb_real.toFixed(2)}</td>
       <td class="ideb-expected">${r.ideb_esperado.toFixed(2)}</td>
       <td class="${r.residuo >= 0 ? "residuo-pos" : "residuo-neg"}">
@@ -227,10 +227,10 @@ function pct(part, total) {
 // Estima ideb_esperado em x usando os dois pontos extremos da série
 function linearAt(data, x) {
   if (!data.length) return 0;
-  const sorted = [...data].sort((a, b) => a.total_receitas_per_capita - b.total_receitas_per_capita);
+  const sorted = [...data].sort((a, b) => a.fundeb_per_aluno_municipal - b.fundeb_per_aluno_municipal);
   const p1 = sorted[0];
   const p2 = sorted[sorted.length - 1];
-  if (p1.total_receitas_per_capita === p2.total_receitas_per_capita) return p1.ideb_esperado;
-  const t = (x - p1.total_receitas_per_capita) / (p2.total_receitas_per_capita - p1.total_receitas_per_capita);
+  if (p1.fundeb_per_aluno_municipal === p2.fundeb_per_aluno_municipal) return p1.ideb_esperado;
+  const t = (x - p1.fundeb_per_aluno_municipal) / (p2.fundeb_per_aluno_municipal - p1.fundeb_per_aluno_municipal);
   return p1.ideb_esperado + t * (p2.ideb_esperado - p1.ideb_esperado);
 }

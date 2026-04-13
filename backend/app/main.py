@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.municipios import router as municipios_router
+from app.api.estados import router as estados_router
 from app.utils.config import settings
 
 app = FastAPI(
@@ -23,6 +24,7 @@ app.add_middleware(
 )
 
 app.include_router(municipios_router)
+app.include_router(estados_router)
 
 
 @app.get("/health", tags=["infra"])

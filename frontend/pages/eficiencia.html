@@ -18,6 +18,7 @@
         <li><a href="distribuicao.html">Distribuição</a></li>
         <li><a href="desempenho.html">Desempenho</a></li>
         <li><a href="eficiencia.html" class="active">Eficiência</a></li>
+        <li><a href="estados.html">Estados</a></li>
         <li><a href="municipio.html">Município</a></li>
         <li><a href="sobre.html">Sobre</a></li>
       </ul>
@@ -43,10 +44,10 @@
         <div class="method-body">
           <h3>Como o score de eficiência é calculado</h3>
           <p>
-            Para cada município com IDEB e per capita disponíveis, ajustamos uma regressão linear simples
-            <em>IDEB = a + b × per_capita</em>. O <strong>resíduo</strong> (IDEB real − IDEB previsto) indica quanto
+            Para cada município com IDEB e dados de matrícula disponíveis, ajustamos uma regressão linear simples
+            <em>IDEB = a + b × fundeb_por_aluno</em>. O <strong>resíduo</strong> (IDEB real − IDEB previsto) indica quanto
             cada município está acima ou abaixo da tendência nacional. Um score positivo significa que o município
-            entrega mais do que a média espera para aquele nível de investimento.
+            entrega mais do que a média espera para aquele nível de investimento por aluno da rede municipal.
           </p>
         </div>
       </div>
@@ -80,7 +81,7 @@
             </select>
             <label class="toggle-label">
               <input type="checkbox" id="filter-outliers" checked />
-              Ocultar outliers (&gt; R$ 5.000)
+              Ocultar outliers (&gt; R$ 20.000/aluno)
             </label>
           </div>
         </div>
@@ -97,7 +98,7 @@
           <p class="eff-subtitle">IDEB real muito acima do esperado para o per capita recebido</p>
           <table class="ranking-table" id="table-efficient">
             <thead>
-              <tr><th>#</th><th>Município</th><th>UF</th><th>Per capita</th><th>IDEB real</th><th>IDEB esperado</th><th>Resíduo</th></tr>
+              <tr><th>#</th><th>Município</th><th>UF</th><th>Por aluno</th><th>IDEB real</th><th>IDEB esperado</th><th>Resíduo</th></tr>
             </thead>
             <tbody><tr><td colspan="7" class="table-loading">Carregando...</td></tr></tbody>
           </table>
@@ -108,7 +109,7 @@
           <p class="eff-subtitle">IDEB real muito abaixo do esperado para o per capita recebido</p>
           <table class="ranking-table" id="table-inefficient">
             <thead>
-              <tr><th>#</th><th>Município</th><th>UF</th><th>Per capita</th><th>IDEB real</th><th>IDEB esperado</th><th>Resíduo</th></tr>
+              <tr><th>#</th><th>Município</th><th>UF</th><th>Por aluno</th><th>IDEB real</th><th>IDEB esperado</th><th>Resíduo</th></tr>
             </thead>
             <tbody><tr><td colspan="7" class="table-loading">Carregando...</td></tr></tbody>
           </table>

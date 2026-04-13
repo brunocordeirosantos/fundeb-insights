@@ -68,18 +68,19 @@ function renderKpis(d) {
     },
     {
       label: "Correlação FUNDEB × IDEB",
-      value: "r = −0,30",
-      sub: "Anos Iniciais · sem outliers extremos",
+      value: "r = —",
+      sub: "calculado ao carregar o scatter",
       cls: "warn",
+      id: "kpi-correlation",
     },
   ];
 
   document.getElementById("kpi-grid").innerHTML = cards
     .map(c => `
-      <div class="kpi-card ${c.cls}">
+      <div class="kpi-card ${c.cls}"${c.id ? ` id="${c.id}"` : ""}>
         <div class="kpi-label">${c.label}</div>
-        <div class="kpi-value">${c.value}</div>
-        <div class="kpi-sub">${c.sub}</div>
+        <div class="kpi-value kpi-corr-value">${c.value}</div>
+        <div class="kpi-sub kpi-corr-sub">${c.sub}</div>
       </div>`)
     .join("");
 }
@@ -90,22 +91,29 @@ async function renderScatter() {
   const uf = document.getElementById("filter-uf").value || null;
   const etapa = document.getElementById("filter-etapa").value;
   const ocultarOutliers = document.getElementById("filter-outliers").checked;
-  const maxPc = ocultarOutliers ? 5000 : null;
+  const maxPc = ocultarOutliers ? 20000 : null;
 
   correlacaoData = await api.correlacao(uf, maxPc);
 
   const validos = correlacaoData.filter(d => d[etapa] !== null && d[etapa] !== undefined);
-  const x = validos.map(d => d.total_receitas_per_capita);
+  const x = validos.map(d => d.fundeb_per_aluno_municipal);
   const y = validos.map(d => d[etapa]);
   const labels = validos.map(d =>
-    `${d.nome_municipio} (${d.uf})<br>Per capita: R$ ${fmtNum(d.total_receitas_per_capita)}<br>IDEB: ${d[etapa]}<br>Pop.: ${fmtNum(d.populacao)}`
+    `${d.nome_municipio} (${d.uf})<br>Por aluno: R$ ${fmtNum(d.fundeb_per_aluno_municipal)}<br>IDEB: ${d[etapa]}<br>Pop.: ${fmtNum(d.populacao)}`
   );
 
   const etapaLabel = etapa.includes("iniciais") ? "Anos Iniciais" : "Anos Finais";
   const r = pearson(x, y);
 
-  // Update callout
+  // Update callout + correlation KPI card
   document.getElementById("insight-r").textContent = `r = ${r.toFixed(2)}`;
+  const corrCard = document.getElementById("kpi-correlation");
+  if (corrCard) {
+    corrCard.querySelector(".kpi-corr-value").textContent = `r = ${r.toFixed(2)}`;
+    const etapaLabel = etapa.includes("iniciais") ? "Anos Iniciais" : "Anos Finais";
+    corrCard.querySelector(".kpi-corr-sub").textContent =
+      `${etapaLabel} · ${ocultarOutliers ? "outliers > R$ 20.000/aluno ocultados" : "todos os valores"}`;
+  }
 
   Plotly.react(
     "chart-scatter",
@@ -130,7 +138,7 @@ async function renderScatter() {
       plot_bgcolor: "#161b22",
       font: { color: "#8b949e", family: "Inter, system-ui, sans-serif", size: 12 },
       xaxis: {
-        title: { text: "Receita FUNDEB per capita (R$)", standoff: 12 },
+        title: { text: "FUNDEB por aluno — rede municipal (R$)", standoff: 12 },
         gridcolor: "#30363d", zerolinecolor: "#30363d",
         tickformat: ",.0f", tickprefix: "R$ ",
       },
@@ -147,7 +155,7 @@ async function renderScatter() {
 
   document.getElementById("scatter-note").textContent =
     `${validos.length.toLocaleString("pt-BR")} municípios · correlação de Pearson r = ${r.toFixed(3)} · ` +
-    (ocultarOutliers ? "outliers (> R$ 5.000) ocultados" : "todos os valores incluídos");
+    (ocultarOutliers ? "outliers (> R$ 20.000/aluno) ocultados" : "todos os valores incluídos");
 }
 
 // ── IDEB por UF ────────────────────────────────────────────────────────────────
