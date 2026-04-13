@@ -3,8 +3,7 @@
  * Orchestrates KPI cards, correlation scatter, and ranking tables.
  */
 
-// ── Map state ─────────────────────────────────────────────────────────────────
-let _geojson     = null;
+// ── Estados state ─────────────────────────────────────────────────────────────
 let _estadosData = [];
 
 document.addEventListener("DOMContentLoaded", init);
@@ -224,99 +223,85 @@ function renderRankingTable(id, rows) {
     </tbody>`;
 }
 
-// ── Choropleth map ────────────────────────────────────────────────────────────
+// ── Bar chart — estados ───────────────────────────────────────────────────────
 
-const UF_IBGE_CODE = {
-  AC:"12", AL:"27", AM:"13", AP:"16", BA:"29", CE:"23", DF:"53", ES:"32",
-  GO:"52", MA:"21", MG:"31", MS:"50", MT:"51", PA:"15", PB:"25", PE:"26",
-  PI:"22", PR:"41", RJ:"33", RN:"24", RO:"11", RR:"14", RS:"43", SC:"42",
-  SE:"28", SP:"35", TO:"17",
+const REGIAO_COLOR = {
+  "Norte":        "#58a6ff",
+  "Nordeste":     "#d29922",
+  "Sudeste":      "#3fb950",
+  "Sul":          "#a5d6ff",
+  "Centro-Oeste": "#bc8cff",
 };
 
 async function renderMapa(estadosData) {
   _estadosData = estadosData;
-  try {
-    if (!_geojson) {
-      const r = await fetch("assets/geojson/brazil_states.json");
-      _geojson = await r.json();
-    }
-    drawMapa(_geojson, estadosData, document.getElementById("map-metric").value);
-  } catch (err) {
-    console.warn("Mapa indisponível:", err);
-    document.getElementById("chart-mapa").innerHTML =
-      '<p style="color:var(--color-muted);text-align:center;padding:3rem 1rem">Mapa não pôde ser carregado.</p>';
-  }
+  drawBarEstados(estadosData, document.getElementById("map-metric").value);
 }
 
-function drawMapa(geojson, data, metric) {
+function drawBarEstados(data, metric) {
   const METRIC_LABEL = {
-    fundeb_per_aluno_estadual: "R$/aluno estadual",
-    razao_per_aluno:           "Razão estadual / municipal",
-    media_ideb_iniciais:       "IDEB médio (Anos Iniciais)",
-  };
-  const METRIC_FMT = {
-    fundeb_per_aluno_estadual: v => v != null ? "R$ " + fmtNum(v) : "—",
-    razao_per_aluno:           v => v != null ? v.toFixed(3) : "—",
-    media_ideb_iniciais:       v => v != null ? v.toFixed(2) : "—",
-  };
-  const COLORSCALES = {
-    fundeb_per_aluno_estadual: [[0,"#2a4a7f"],[0.5,"#1c7ed6"],[1,"#74c0fc"]],
-    razao_per_aluno:           [[0,"#da3633"],[0.5,"#d29922"],[1,"#3fb950"]],
-    media_ideb_iniciais:       [[0,"#da3633"],[0.5,"#d29922"],[1,"#3fb950"]],
+    fundeb_per_aluno_estadual: "FUNDEB por aluno — rede estadual (R$)",
+    razao_per_aluno:           "Razão estadual / mediana municipal",
+    media_ideb_iniciais:       "IDEB médio dos municípios (Anos Iniciais)",
   };
 
-  const valid = data.filter(d => d[metric] != null && UF_IBGE_CODE[d.uf]);
-  const locations = valid.map(d => UF_IBGE_CODE[d.uf]);
-  const zValues   = valid.map(d => d[metric]);
-  const hoverText = valid.map(d =>
-    `<b>${d.uf} — ${d.nome_estado}</b><br>` +
-    `Região: ${d.regiao}<br>` +
-    `R$/aluno estadual: ${METRIC_FMT.fundeb_per_aluno_estadual(d.fundeb_per_aluno_estadual)}<br>` +
-    `Mediana municipal: ${METRIC_FMT.fundeb_per_aluno_estadual(d.mediana_per_aluno_municipal)}<br>` +
-    `Razão: ${METRIC_FMT.razao_per_aluno(d.razao_per_aluno)}<br>` +
-    `IDEB: ${METRIC_FMT.media_ideb_iniciais(d.media_ideb_iniciais)}`
-  );
+  const valid = [...data.filter(d => d[metric] != null)]
+    .sort((a, b) => a[metric] - b[metric]);
 
-  Plotly.react("chart-mapa", [{
-    type:         "choropleth",
-    geojson:      geojson,
-    locations:    locations,
-    z:            zValues,
-    featureidkey: "properties.codarea",
-    text:         hoverText,
-    hovertemplate:"%{text}<extra></extra>",
-    colorscale:   COLORSCALES[metric],
-    colorbar: {
-      title:     { text: METRIC_LABEL[metric], side: "right", font: { color: "#8b949e", size: 11 } },
-      thickness: 14,
-      len:       0.65,
-      tickfont:  { color: "#8b949e", size: 10 },
-      bgcolor:   "rgba(0,0,0,0)",
-      bordercolor:"rgba(0,0,0,0)",
-    },
-    marker: { line: { color: "#0d1117", width: 0.8 } },
-  }], {
-    geo: {
-      fitbounds:      "locations",
-      visible:        true,
-      bgcolor:        "#161b22",
-      showland:       false,
-      showocean:      false,
-      showlakes:      false,
-      showrivers:     false,
-      showcoastlines: false,
-      showframe:      false,
-      showsubunits:   false,
-      projection:     { type: "mercator" },
-    },
+  const regioes = ["Norte", "Nordeste", "Centro-Oeste", "Sudeste", "Sul"];
+  const allUfs  = valid.map(d => d.uf);
+
+  const traces = regioes.map(regiao => {
+    const rows = valid.filter(d => d.regiao === regiao);
+    return {
+      type:          "bar",
+      orientation:   "h",
+      name:          regiao,
+      x:             rows.map(d => d[metric]),
+      y:             rows.map(d => d.uf),
+      marker:        { color: REGIAO_COLOR[regiao], opacity: 0.85 },
+      hovertext:     rows.map(d =>
+        `<b>${d.uf} — ${d.nome_estado}</b><br>` +
+        `Região: ${d.regiao}<br>` +
+        `R$/aluno estadual: R$ ${fmtNum(d.fundeb_per_aluno_estadual)}<br>` +
+        `Mediana municipal: R$ ${fmtNum(d.mediana_per_aluno_municipal)}<br>` +
+        `Razão: ${d.razao_per_aluno?.toFixed(3) ?? "—"}<br>` +
+        `IDEB: ${d.media_ideb_iniciais?.toFixed(2) ?? "—"}`
+      ),
+      hovertemplate: "%{hovertext}<extra></extra>",
+    };
+  });
+
+  const isCurrency = metric === "fundeb_per_aluno_estadual";
+
+  Plotly.react("chart-mapa", traces, {
+    barmode:       "overlay",
     paper_bgcolor: "rgba(0,0,0,0)",
-    plot_bgcolor:  "rgba(0,0,0,0)",
-    margin: { t: 0, r: 40, b: 0, l: 0 },
-    font:   { color: "#8b949e", family: "Inter, system-ui, sans-serif" },
+    plot_bgcolor:  "#161b22",
+    font: { color: "#8b949e", family: "Inter, system-ui, sans-serif", size: 11 },
+    xaxis: {
+      title:         { text: METRIC_LABEL[metric], standoff: 10 },
+      gridcolor:     "#30363d",
+      zerolinecolor: "#30363d",
+      tickformat:    isCurrency ? ",.0f" : ".2f",
+      tickprefix:    isCurrency ? "R$ " : "",
+    },
+    yaxis: {
+      gridcolor:     "#30363d",
+      categoryorder: "array",
+      categoryarray: allUfs,
+    },
+    margin: { t: 10, r: 20, b: 60, l: 40 },
+    legend: {
+      orientation: "h", x: 0, y: 1.04,
+      bgcolor: "rgba(0,0,0,0)",
+      font: { color: "#8b949e", size: 11 },
+    },
+    hovermode: "closest",
   }, { responsive: true, displayModeBar: false });
 
   document.getElementById("map-subtitle").textContent =
-    `${METRIC_LABEL[metric]} · ${valid.length} estados · FUNDEB 2026`;
+    `${valid.length} estados · ordenado por valor · FUNDEB 2026`;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
