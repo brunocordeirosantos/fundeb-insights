@@ -23,8 +23,11 @@ async function init() {
     await renderCorrelacao();
     await renderRankings();
 
-    // Re-render chart on filter changes
-    document.getElementById("filter-uf").addEventListener("change", renderCorrelacao);
+    // Re-render chart and rankings on filter changes
+    document.getElementById("filter-uf").addEventListener("change", () => {
+      renderCorrelacao();
+      renderRankings();
+    });
     document.getElementById("filter-etapa").addEventListener("change", renderCorrelacao);
     document.getElementById("filter-outliers").addEventListener("change", renderCorrelacao);
     document.getElementById("map-metric").addEventListener("change", () => {
@@ -185,12 +188,16 @@ async function renderCorrelacao() {
 // ── Ranking tables ─────────────────────────────────────────────────────────────
 
 async function renderRankings() {
+  const uf = document.getElementById("filter-uf").value || null;
   const [top, bot] = await Promise.all([
-    api.ranking(null, 10, "desc"),
-    api.ranking(null, 10, "asc"),
+    api.ranking(uf, 10, "desc"),
+    api.ranking(uf, 10, "asc"),
   ]);
   renderRankingTable("table-top", top);
   renderRankingTable("table-bot", bot);
+  document.getElementById("ranking-subtitle").textContent = uf
+    ? `Municípios de ${uf} com maior e menor investimento por aluno`
+    : "Municípios com maior e menor investimento por aluno da rede municipal";
 }
 
 function renderRankingTable(id, rows) {
