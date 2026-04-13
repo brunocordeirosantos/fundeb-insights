@@ -260,8 +260,8 @@ function drawMapa(geojson, data, metric) {
     media_ideb_iniciais:       v => v != null ? v.toFixed(2) : "—",
   };
   const COLORSCALES = {
-    fundeb_per_aluno_estadual: [[0,"#101827"],[0.35,"#1e3a5f"],[0.65,"#2563a8"],[1,"#58a6ff"]],
-    razao_per_aluno:           [[0,"#f85149"],[0.45,"#d29922"],[0.55,"#d29922"],[1,"#3fb950"]],
+    fundeb_per_aluno_estadual: [[0,"#2a4a7f"],[0.5,"#1c7ed6"],[1,"#74c0fc"]],
+    razao_per_aluno:           [[0,"#da3633"],[0.5,"#d29922"],[1,"#3fb950"]],
     media_ideb_iniciais:       [[0,"#da3633"],[0.5,"#d29922"],[1,"#3fb950"]],
   };
 
@@ -299,9 +299,8 @@ function drawMapa(geojson, data, metric) {
     geo: {
       fitbounds:      "locations",
       visible:        true,
-      bgcolor:        "#0d1117",
-      landcolor:      "#161b22",
-      showland:       true,
+      bgcolor:        "#161b22",
+      showland:       false,
       showocean:      false,
       showlakes:      false,
       showrivers:     false,
