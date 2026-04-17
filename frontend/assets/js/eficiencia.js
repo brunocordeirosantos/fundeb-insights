@@ -172,7 +172,14 @@ function renderScatter(data, etapa) {
 
   const acima = data.filter(d => d.residuo > 0).length;
   document.getElementById("scatter-note").textContent =
-    `${data.length.toLocaleString("pt-BR")} municípios · ${acima.toLocaleString("pt-BR")} acima da linha de tendência (${pct(acima, data.length)})`;
+    `${data.length.toLocaleString("pt-BR")} municípios · ${acima.toLocaleString("pt-BR")} acima da tendência (${pct(acima, data.length)}) · clique num ponto para ver o perfil do município`;
+
+  const chartEl = document.getElementById("chart-scatter");
+  chartEl.removeAllListeners("plotly_click");
+  chartEl.on("plotly_click", (e) => {
+    const cod = data[e.points[0].pointIndex]?.cod_municipio;
+    if (cod) window.location.href = `municipio.html?cod=${cod}`;
+  });
 }
 
 // ── Tabelas de ranking ─────────────────────────────────────────────────────────

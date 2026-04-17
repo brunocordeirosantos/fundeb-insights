@@ -181,7 +181,14 @@ async function renderCorrelacao() {
   const n = data.filter((d) => d[etapa] !== null).length;
   const corr = pearson(x, y);
   document.getElementById("chart-note").textContent =
-    `${n.toLocaleString("pt-BR")} municípios plotados · correlação de Pearson r = ${corr.toFixed(3)} · ${ocultarOutliers ? "outliers (> R$ 20.000/aluno) ocultados" : "todos os valores incluídos"}`;
+    `${n.toLocaleString("pt-BR")} municípios plotados · r = ${corr.toFixed(3)} · ${ocultarOutliers ? "outliers ocultados" : "todos os valores"} · clique num ponto para ver o perfil do município`;
+
+  const chartEl = document.getElementById("chart-correlacao");
+  chartEl.removeAllListeners("plotly_click");
+  chartEl.on("plotly_click", (e) => {
+    const cod = data[e.points[0].pointIndex]?.cod_municipio;
+    if (cod) window.location.href = `pages/municipio.html?cod=${cod}`;
+  });
 }
 
 // ── Ranking tables ─────────────────────────────────────────────────────────────

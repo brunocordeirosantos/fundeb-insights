@@ -154,8 +154,16 @@ async function renderScatter() {
   );
 
   document.getElementById("scatter-note").textContent =
-    `${validos.length.toLocaleString("pt-BR")} municípios · correlação de Pearson r = ${r.toFixed(3)} · ` +
-    (ocultarOutliers ? "outliers (> R$ 20.000/aluno) ocultados" : "todos os valores incluídos");
+    `${validos.length.toLocaleString("pt-BR")} municípios · r = ${r.toFixed(3)} · ` +
+    (ocultarOutliers ? "outliers ocultados" : "todos os valores") +
+    " · clique num ponto para ver o perfil do município";
+
+  const chartEl = document.getElementById("chart-scatter");
+  chartEl.removeAllListeners("plotly_click");
+  chartEl.on("plotly_click", (e) => {
+    const cod = validos[e.points[0].pointIndex]?.cod_municipio;
+    if (cod) window.location.href = `municipio.html?cod=${cod}`;
+  });
 }
 
 // ── IDEB por UF ────────────────────────────────────────────────────────────────
