@@ -8,5 +8,5 @@ services:
     startCommand: python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: ALLOWED_ORIGINS
-        value: https://snazzy-conkies-2070a4.netlify.app
+        value: https://brunocordeirosantos.github.io
     autoDeploy: true
