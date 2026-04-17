@@ -206,4 +206,24 @@
   .detail-grid { grid-template-columns: 1fr; }
   .detail-block--full { grid-column: 1; }
   .method-callout { flex-direction: column; gap: var(--space-md); }
+
+  /* Oculta Região (col 3) e % alunos estado (col 7) */
+  .estados-table th:nth-child(3),
+  .estados-table td:nth-child(3),
+  .estados-table th:nth-child(7),
+  .estados-table td:nth-child(7) { display: none; }
+
+  .estados-table th, .estados-table td { padding: 8px 10px; }
+  .estados-table { font-size: 0.8rem; }
+}
+
+@media (max-width: 480px) {
+  /* Oculta também o nome do estado (col 2) — UF já identifica */
+  .estados-table th:nth-child(2),
+  .estados-table td:nth-child(2) { display: none; }
+
+  .estados-table th, .estados-table td { padding: 6px 8px; }
+  .estados-table { font-size: 0.75rem; }
+  .detail-title { font-size: 1.1rem; }
+  .detail-uf-badge { font-size: 1.3rem; }
 }

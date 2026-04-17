@@ -230,5 +230,25 @@
 .ideb-card.below-avg .ideb-score { color: var(--color-danger); }
 .ideb-sub   { font-size: 0.72rem; color: var(--color-muted); margin-top: 6px; }
 
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .ideb-scores { grid-template-columns: 1fr 1fr; }
+  .search-row { flex-direction: column; }
+  .select-uf { min-width: unset; }
+  .muni-header { padding: var(--space-md); }
+}
+
+@media (max-width: 480px) {
+  .ideb-scores { grid-template-columns: 1fr; }
+  .ideb-score { font-size: 1.9rem; }
+  .muni-name { font-size: 1.2rem; }
+  .muni-pop-value { font-size: 1.1rem; }
+  .muni-block { padding: var(--space-md); }
+  .muni-block-title { font-size: 0.78rem; margin-bottom: var(--space-md); }
+  .metric-label { font-size: 0.78rem; }
+  .metric-value { font-size: 0.88rem; }
+  .metric-row--highlight .metric-value { font-size: 1.05rem; }
+}
+
 /* ── Utility ──────────────────────────────────────────────── */
 .hidden { display: none !important; }
