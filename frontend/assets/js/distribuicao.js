@@ -18,6 +18,7 @@ async function init() {
     ufsData = ufs;
 
     renderKpis(resumo, ufs);
+    renderInsight(ufs);
     populateUfFilter(filtros.ufs);
     renderChartUfs();
     await renderRanking();
@@ -89,6 +90,26 @@ function renderKpis(resumo, ufs) {
         <div class="kpi-sub">${c.sub}</div>
       </div>`)
     .join("");
+}
+
+// ── Insight callout ────────────────────────────────────────────────────────────
+
+function renderInsight(ufs) {
+  const withData = ufs.filter(u => u.media_per_aluno_municipal);
+  if (!withData.length) return;
+
+  const maxUf = withData.reduce((a, b) => b.media_per_aluno_municipal > a.media_per_aluno_municipal ? b : a);
+  const minUf = withData.reduce((a, b) => b.media_per_aluno_municipal < a.media_per_aluno_municipal ? b : a);
+  const ratio = maxUf.media_per_aluno_municipal / minUf.media_per_aluno_municipal;
+
+  document.getElementById("insight-ratio").textContent = `${ratio.toFixed(0)}×`;
+  document.getElementById("insight-body").innerHTML =
+    `A média de investimento por aluno da rede municipal varia de
+    <strong>${fmtCurrency(minUf.media_per_aluno_municipal)}</strong> (${minUf.uf}) a
+    <strong>${fmtCurrency(maxUf.media_per_aluno_municipal)}</strong> (${maxUf.uf}) entre os estados.
+    Essa diferença reflete fatores estruturais: estados com redes menores e menos matrículas recebem
+    proporcionalmente mais do VAAF — o componente redistributivo do FUNDEB —
+    resultando em médias por aluno mais altas, mesmo com totais de transferência menores.`;
 }
 
 // ── Bar chart por UF ───────────────────────────────────────────────────────────

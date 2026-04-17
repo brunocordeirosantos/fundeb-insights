@@ -33,7 +33,7 @@
     <section class="hero">
       <div class="hero-badge">FUNDEB 2026 · 27 estados</div>
       <h1>Distribuição de Recursos</h1>
-      <p>Compare a receita FUNDEB per capita entre estados e municípios. Entenda onde o investimento é maior — e o que explica essa disparidade.</p>
+      <p>Compare o investimento <strong>por aluno</strong> do FUNDEB entre estados e municípios. Entenda onde os recursos são maiores — e o que explica essa disparidade.</p>
     </section>
 
     <!-- KPIs rápidos -->
@@ -43,6 +43,20 @@
         <div class="kpi-card skeleton"></div>
         <div class="kpi-card skeleton"></div>
         <div class="kpi-card skeleton"></div>
+      </div>
+    </section>
+
+    <!-- Insight callout -->
+    <section class="section">
+      <div class="dist-insight">
+        <div class="dist-insight-stat">
+          <div class="dist-insight-value" id="insight-ratio">—</div>
+          <div class="dist-insight-label">razão máx / mín entre estados</div>
+        </div>
+        <div class="dist-insight-body">
+          <h3>Desigualdade regional no investimento por aluno</h3>
+          <p id="insight-body">Carregando...</p>
+        </div>
       </div>
     </section>
 
@@ -102,22 +116,24 @@
             <span class="api-alert-desc">Verifique a conexão com a API.</span>
           </div>
         </div>
-        <table class="ranking-table" id="ranking-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Município</th>
-              <th>UF</th>
-              <th>População</th>
-              <th>Total FUNDEB</th>
-              <th>Por aluno (municipal)</th>
-              <th>IDEB Iniciais</th>
-            </tr>
-          </thead>
-          <tbody id="ranking-body">
-            <tr><td colspan="7" class="table-loading">Carregando...</td></tr>
-          </tbody>
-        </table>
+        <div class="table-wrap">
+          <table class="ranking-table" id="ranking-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Município</th>
+                <th>UF</th>
+                <th>População</th>
+                <th>Total FUNDEB</th>
+                <th>Por aluno (municipal)</th>
+                <th>IDEB Iniciais</th>
+              </tr>
+            </thead>
+            <tbody id="ranking-body">
+              <tr><td colspan="7" class="table-loading">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 

@@ -90,4 +90,17 @@
 
 @media (max-width: 768px) {
   .method-callout { flex-direction: column; gap: var(--space-md); padding: var(--space-lg); }
+
+  /* Oculta "IDEB esperado" (col 6) — resíduo já comunica o desvio */
+  .eff-block .ranking-table th:nth-child(6),
+  .eff-block .ranking-table td:nth-child(6) { display: none; }
+}
+
+@media (max-width: 480px) {
+  /* Oculta também "Por aluno" (col 4) */
+  .eff-block .ranking-table th:nth-child(4),
+  .eff-block .ranking-table td:nth-child(4) { display: none; }
+
+  .efficiency-rankings { gap: var(--space-md); }
+  .eff-block { padding: var(--space-md); }
 }
