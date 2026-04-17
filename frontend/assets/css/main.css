@@ -151,6 +151,7 @@ a:hover { text-decoration: underline; }
 }
 .chart-card .section-header { margin-bottom: var(--space-md); }
 .chart-container { width: 100%; height: 480px; }
+.chart-container--tall { height: 580px; }
 .chart-note { font-size: 0.8rem; color: var(--color-muted); margin-top: var(--space-sm); }
 
 /* ── API Alert ───────────────────────────────────────────── */
@@ -275,10 +276,71 @@ a:hover { text-decoration: underline; }
   line-height: 2;
 }
 
+/* ── Hamburger button ────────────────────────────────────── */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--color-text);
+}
+.nav-toggle span {
+  display: block;
+  width: 22px; height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
 /* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .chart-container--tall { height: 480px; }
+}
+
 @media (max-width: 768px) {
-  .nav-links { display: none; }
+  .nav-toggle { display: flex; }
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    flex-direction: column;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-sm) 0;
+    z-index: 99;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links li { width: 100%; }
+  .nav-links a {
+    display: block;
+    padding: 10px var(--space-lg);
+    border-radius: 0;
+  }
+
   .hero { margin-top: var(--space-lg); }
   .section-header { flex-direction: column; }
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .chart-container { height: 380px; }
+  .chart-container--tall { height: 420px; }
+}
+
+@media (max-width: 480px) {
+  .nav { padding: 12px var(--space-md); }
+  .hero { padding: 0 var(--space-md); margin-top: var(--space-md); }
+  .section { padding: 0 var(--space-md); }
+  .chart-card { padding: var(--space-md); }
+  .kpi-grid { gap: var(--space-sm); }
+  .kpi-card { padding: var(--space-md) var(--space-sm); }
+  .kpi-value { font-size: 1.5rem; }
+  .chart-container { height: 300px; }
+  .chart-container--tall { height: 340px; }
+  .ranking-table { font-size: 0.78rem; }
+  .ranking-table th, .ranking-table td { padding: 6px 8px; }
 }
