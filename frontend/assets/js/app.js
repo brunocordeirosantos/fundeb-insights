@@ -155,7 +155,7 @@ async function renderCorrelacao() {
         },
       },
     ],
-    {
+    mobileLayout({
       paper_bgcolor: "transparent",
       plot_bgcolor: "#161b22",
       font: { color: "#8b949e", family: "Inter, system-ui, sans-serif", size: 12 },
@@ -174,7 +174,7 @@ async function renderCorrelacao() {
       },
       margin: { t: 20, r: 20, b: 60, l: 60 },
       hovermode: "closest",
-    },
+    }),
     { responsive: true, displayModeBar: false }
   );
 
@@ -274,7 +274,7 @@ function drawBarEstados(data, metric) {
 
   const isCurrency = metric === "fundeb_per_aluno_estadual";
 
-  Plotly.react("chart-mapa", traces, {
+  Plotly.react("chart-mapa", traces, mobileLayout({
     barmode:       "overlay",
     paper_bgcolor: "rgba(0,0,0,0)",
     plot_bgcolor:  "#161b22",
@@ -298,7 +298,7 @@ function drawBarEstados(data, metric) {
       font: { color: "#8b949e", size: 11 },
     },
     hovermode: "closest",
-  }, { responsive: true, displayModeBar: false });
+  }), { responsive: true, displayModeBar: false });
 
   document.getElementById("map-subtitle").textContent =
     `${valid.length} estados · ordenado por valor · FUNDEB 2026`;

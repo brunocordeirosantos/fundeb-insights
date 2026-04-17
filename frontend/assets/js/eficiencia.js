@@ -148,7 +148,7 @@ function renderScatter(data, etapa) {
   Plotly.react(
     "chart-scatter",
     [scatter, regLine],
-    {
+    mobileLayout({
       paper_bgcolor: "transparent",
       plot_bgcolor: "#161b22",
       font: { color: "#8b949e", family: "Inter, system-ui, sans-serif", size: 12 },
@@ -166,7 +166,7 @@ function renderScatter(data, etapa) {
       hovermode: "closest",
       showlegend: true,
       legend: { x: 1, xanchor: "right", y: 1, bgcolor: "transparent", font: { color: "#8b949e", size: 11 } },
-    },
+    }),
     { responsive: true, displayModeBar: false }
   );
 

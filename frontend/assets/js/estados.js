@@ -186,7 +186,7 @@ function renderBarChart(data) {
     hovermode: "x unified",
   };
 
-  Plotly.react("chart-bar", traces, layout, { responsive: true, displayModeBar: false });
+  Plotly.react("chart-bar", traces, mobileLayout(layout), { responsive: true, displayModeBar: false });
 
   const note = document.getElementById("chart-bar-note");
   note.textContent = `${sorted.length} estados · ordenado por ${document.getElementById("filter-ordem-bar").selectedOptions[0].text.toLowerCase()}`;
@@ -234,7 +234,7 @@ function renderScatter(data) {
     ).map(t => t + "<extra></extra>"),
   }));
 
-  Plotly.react("chart-scatter", traces, {
+  Plotly.react("chart-scatter", traces, mobileLayout({
     paper_bgcolor: "transparent",
     plot_bgcolor: "#161b22",
     font: { color: "#8b949e", family: "Inter, system-ui, sans-serif", size: 12 },
@@ -251,7 +251,7 @@ function renderScatter(data) {
     margin: { t: 20, r: 20, b: 60, l: 70 },
     hovermode: "closest",
     legend: { x: 1, xanchor: "right", y: 1, bgcolor: "transparent", font: { color: "#8b949e", size: 11 } },
-  }, { responsive: true, displayModeBar: false });
+  }), { responsive: true, displayModeBar: false });
 }
 
 // ── Table ───────────────────────────────────────────────────────────────────────

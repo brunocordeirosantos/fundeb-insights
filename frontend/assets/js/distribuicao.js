@@ -148,7 +148,7 @@ function renderChartUfs() {
       customdata: hoverText,
       marker: { color: colors },
     }],
-    {
+    mobileLayout({
       paper_bgcolor: "transparent",
       plot_bgcolor: "#161b22",
       font: { color: "#8b949e", family: "Inter, system-ui, sans-serif", size: 12 },
@@ -162,7 +162,7 @@ function renderChartUfs() {
       yaxis: { gridcolor: "#30363d", automargin: true },
       margin: { t: 10, r: 100, b: 60, l: 50 },
       hovermode: "closest",
-    },
+    }),
     { responsive: true, displayModeBar: false }
   );
 

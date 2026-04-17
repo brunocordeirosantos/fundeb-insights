@@ -334,13 +334,19 @@ a:hover { text-decoration: underline; }
 @media (max-width: 480px) {
   .nav { padding: 12px var(--space-md); }
   .hero { padding: 0 var(--space-md); margin-top: var(--space-md); }
+  .hero p { font-size: 0.92rem; }
   .section { padding: 0 var(--space-md); }
+  .section-title { font-size: 1.1rem; }
+  .section-subtitle { font-size: 0.8rem; }
   .chart-card { padding: var(--space-md); }
   .kpi-grid { gap: var(--space-sm); }
   .kpi-card { padding: var(--space-md) var(--space-sm); }
-  .kpi-value { font-size: 1.5rem; }
+  .kpi-label { font-size: 0.7rem; }
+  .kpi-value { font-size: 1.4rem; }
+  .kpi-sub { font-size: 0.72rem; }
   .chart-container { height: 300px; }
   .chart-container--tall { height: 340px; }
+  .chart-note { font-size: 0.72rem; }
   .ranking-table { font-size: 0.78rem; }
   .ranking-table th, .ranking-table td { padding: 6px 8px; }
 }

@@ -133,7 +133,7 @@ async function renderScatter() {
         opacity: 0.7,
       },
     }],
-    {
+    mobileLayout({
       paper_bgcolor: "transparent",
       plot_bgcolor: "#161b22",
       font: { color: "#8b949e", family: "Inter, system-ui, sans-serif", size: 12 },
@@ -149,7 +149,7 @@ async function renderScatter() {
       },
       margin: { t: 20, r: 20, b: 60, l: 60 },
       hovermode: "closest",
-    },
+    }),
     { responsive: true, displayModeBar: false }
   );
 
@@ -199,7 +199,7 @@ function renderIdebUfs() {
       hovertemplate: `Média nacional: ${avg.toFixed(2)}<extra></extra>`,
       name: `Média: ${avg.toFixed(2)}`,
     }],
-    {
+    mobileLayout({
       paper_bgcolor: "transparent",
       plot_bgcolor: "#161b22",
       font: { color: "#8b949e", family: "Inter, system-ui, sans-serif", size: 12 },
@@ -213,7 +213,7 @@ function renderIdebUfs() {
       hovermode: "closest",
       showlegend: true,
       legend: { x: 1, xanchor: "right", y: 0, bgcolor: "transparent", font: { color: "#8b949e", size: 11 } },
-    },
+    }),
     { responsive: true, displayModeBar: false }
   );
 }
